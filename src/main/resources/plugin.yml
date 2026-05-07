@@ -1,0 +1,6 @@
+name: Skyblock
+version: '1.0-SNAPSHOT'
+main: net.teuos.skyblock.Skyblock
+api-version: '1.21'
+authors: [ teuos, Juskie ]
+description: Velocity side for a join leave message handler
