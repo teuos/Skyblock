@@ -1,6 +1,7 @@
 package net.teuos.skyblock;
 
 import net.teuos.skyblock.commands.Island;
+import net.teuos.skyblock.managers.CreateIslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,6 +30,8 @@ public final class Skyblock extends JavaPlugin {
 
         IslandLevelManager levelManager = new IslandLevelManager(islandLevelFile);
 
+        CreateIslandManager islandManager = new CreateIslandManager(islandLevelFile);
+
 
         try {
             if (!islandLevelFile.exists()) {
@@ -48,7 +51,7 @@ public final class Skyblock extends JavaPlugin {
         // Register CobbleGen
         getServer().getPluginManager().registerEvents(new CobbleGen(levelManager), this);
 
-        getCommand("island").setExecutor(new Island(levelManager));
+        getCommand("island").setExecutor(new Island(levelManager, islandManager));
 
 
     }

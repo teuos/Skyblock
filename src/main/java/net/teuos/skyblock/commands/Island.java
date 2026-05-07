@@ -1,5 +1,6 @@
 package net.teuos.skyblock.commands;
 
+import net.teuos.skyblock.managers.CreateIslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -13,9 +14,11 @@ import java.io.IOException;
 public class Island implements CommandExecutor {
 
     private final IslandLevelManager levelManager;
+    private final CreateIslandManager islandManager;
 
-    public Island(IslandLevelManager levelManager) {
+    public Island(IslandLevelManager levelManager, CreateIslandManager islandManager) {
         this.levelManager = levelManager;
+        this.islandManager = islandManager;
     }
 
 
@@ -59,6 +62,13 @@ public class Island implements CommandExecutor {
 
 
             }
+
+        }
+
+        if (args[0].equalsIgnoreCase("create")) {
+
+            islandManager.createIsland(player.getPlayer().getUniqueId().toString());
+
 
         }
 
