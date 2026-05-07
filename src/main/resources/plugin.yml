@@ -4,3 +4,6 @@ main: net.teuos.skyblock.Skyblock
 api-version: '1.21'
 authors: [ teuos, Juskie ]
 description: A skyblock core plugin
+commands:
+  island:
+    description: Skyblock island commands
