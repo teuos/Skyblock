@@ -8,10 +8,16 @@ public final class Skyblock extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
 
+        System.out.println("Skyblock is enabled");
+
+        // Register listeners
+        getServer().getPluginManager().registerEvents(new Listeners(), this);
+
+
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        System.out.println("Skyblock is disabled");
     }
 }
