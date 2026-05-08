@@ -175,9 +175,58 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
         if (args[0].equalsIgnoreCase("trust")) {
 
+            try {
+                if (args.length < 2) {
+                    player.sendMessage("Usage: /island trust <player>");
+                    return true;
+                }
+
+                if (csvInteract.IslandExists(player.getUniqueId().toString())) {
+                    islandManager.loadIsland(player.getUniqueId().toString());
+                    World target = Bukkit.getWorld(player.getUniqueId().toString());
+
+                    if (islandPermissionsManager.addMember(Bukkit.getPlayer(args[1]), target)) {
+                        player.sendMessage(ChatColor.GREEN + args[1] + " is now trusted on your island!");
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Somthing went wrong!");
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED +  "you do not have a island!");
+                }
+
+
+
+            } catch (IOException e) {
+                player.sendMessage(ChatColor.RED + "Somthing went wrong please report the issue!");
+            }
         }
 
         if (args[0].equalsIgnoreCase("untrust")) {
+
+            try {
+                if (args.length < 2) {
+                    player.sendMessage("Usage: /unisland trust <player>");
+                    return true;
+                }
+
+                if (csvInteract.IslandExists(player.getUniqueId().toString())) {
+                    islandManager.loadIsland(player.getUniqueId().toString());
+                    World target = Bukkit.getWorld(player.getUniqueId().toString());
+
+                    if (islandPermissionsManager.removeMember(Bukkit.getPlayer(args[1]), target)) {
+                        player.sendMessage(ChatColor.GREEN + args[1] + " is no longer trusted on your island!");
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Somthing went wrong!");
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED +  "you do not have a island!");
+                }
+
+
+
+            } catch (IOException e) {
+                player.sendMessage(ChatColor.RED + "Somthing went wrong please report the issue!");
+            }
 
         }
 
@@ -197,6 +246,8 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
             completions.add("teleport");
             completions.add("help");
             completions.add("visit");
+            completions.add("trust");
+            completions.add("untrust");
 
             return completions;
         }
@@ -209,6 +260,20 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
             if (args[0].equalsIgnoreCase("visit")) {
 
+                List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+                for (Player p : players) {
+                    completions.add(p.getName());
+                }
+            }
+
+            if (args[0].equalsIgnoreCase("trust")) {
+                List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+                for (Player p : players) {
+                    completions.add(p.getName());
+                }
+            }
+
+            if (args[0].equalsIgnoreCase("untrust")) {
                 List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
                 for (Player p : players) {
                     completions.add(p.getName());

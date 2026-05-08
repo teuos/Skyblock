@@ -7,6 +7,12 @@
 - teleport - Allows a user to teleport to their island
 - level:
   - generator - Will level up a users generators
+  - border - Will level up a users world border
+- visit - Allows a user to visit another users island
+- trust - Allows a user to trust another user in their island
+- untrust - Allows a user to untrust another user in their island
+
+### /skyblock:
 - template:
   - create - Allows an admin to create the template island
   - delete - Allows an admin to delete the template island

@@ -69,4 +69,34 @@ public class IslandPermissionsManager {
 
     }
 
+    public boolean addMember(Player player, World world){
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regions = container.get(BukkitAdapter.adapt(world));
+
+        if (regions == null) {
+            return false;
+        }
+
+        GlobalProtectedRegion global = (GlobalProtectedRegion) regions.getRegion("__global__");
+
+        global.getMembers().addPlayer(player.getUniqueId());
+
+        return global.getMembers().contains(player.getUniqueId());
+    }
+
+    public boolean removeMember(Player player, World world){
+
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regions = container.get(BukkitAdapter.adapt(world));
+        if (regions == null) {
+            return false;
+        }
+
+        GlobalProtectedRegion global = (GlobalProtectedRegion) regions.getRegion("__global__");
+
+        global.getMembers().removePlayer(player.getUniqueId());
+
+        return !global.getMembers().contains(player.getUniqueId());
+    }
+
 }
