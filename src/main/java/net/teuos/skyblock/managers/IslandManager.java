@@ -4,11 +4,10 @@ package net.teuos.skyblock.managers;
 import com.infernalsuite.asp.api.AdvancedSlimePaperAPI;
 import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.api.world.SlimeWorld;
-import com.infernalsuite.asp.api.world.SlimeWorldInstance;
 import com.infernalsuite.asp.api.world.properties.SlimeProperties;
 import com.infernalsuite.asp.api.world.properties.SlimePropertyMap;
 import com.sk89q.worldguard.WorldGuard;
-import net.teuos.skyblock.libs.CSVInteract;
+import net.teuos.skyblock.libs.CSVLibs;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -29,17 +28,17 @@ public class CreateIslandManager {
     private final AdvancedSlimePaperAPI api;
     private final WorldGuard worldGuard;
     private final IslandPermissionsManager permissionsManager;
-    private final CSVInteract csvInteract;
+    private final CSVLibs csvLibs;
     private final IslandLevelManager islandLevelManager;
 
 
-    public CreateIslandManager(File csvFile, SlimeLoader loader, WorldGuard worldGuard, IslandPermissionsManager permissionsManager, CSVInteract csvInteract, IslandLevelManager islandLevelManager) {
+    public CreateIslandManager(File csvFile, SlimeLoader loader, WorldGuard worldGuard, IslandPermissionsManager permissionsManager, CSVLibs csvLibs, IslandLevelManager islandLevelManager) {
         this.csvFile = csvFile;
         this.loader = loader;
         this.worldGuard = worldGuard;
         this.api = AdvancedSlimePaperAPI.instance();
         this.permissionsManager = permissionsManager;
-        this.csvInteract = csvInteract;
+        this.csvLibs = csvLibs;
         this.islandLevelManager = islandLevelManager;
     }
 
@@ -68,10 +67,7 @@ public class CreateIslandManager {
 
             World world = Bukkit.getWorld(islandName);
 
-            List<String> lines = Files.readAllLines(this.csvFile.toPath(), StandardCharsets.UTF_8);
-            List<String> updatedLines = new ArrayList<>(lines);
-            updatedLines.add(islandName + ",0,0");
-            Files.write(csvFile.toPath(), updatedLines);
+            csvLibs.createRecord(islandName,0,0);
 
             permissionsManager.applyDefaultFlags(world, islandName);
 
@@ -108,30 +104,32 @@ public class CreateIslandManager {
 
             loader.deleteWorld(islandName);
 
-            List<String> lines = Files.readAllLines(this.csvFile.toPath(), StandardCharsets.UTF_8);
-            List<String> updatedLines = new ArrayList<>();
+            csvLibs.deleteRecord(islandName);
 
-            updatedLines.add(lines.get(0));
-
-
-            for (int i = 1; i < lines.size(); i++) {
-                String line = lines.get(i);
-                String[] split = line.split(",");
-
-
-                String storedWorld = split[0];
-
-                if (!storedWorld.equals(islandName)) {
-                    updatedLines.add(line);
-                }
-
-            }
-
-            Files.write(
-                    csvFile.toPath(),
-                    updatedLines,
-                    StandardCharsets.UTF_8
-            );
+//            List<String> lines = Files.readAllLines(this.csvFile.toPath(), StandardCharsets.UTF_8);
+//            List<String> updatedLines = new ArrayList<>();
+//
+//            updatedLines.add(lines.get(0));
+//
+//
+//            for (int i = 1; i < lines.size(); i++) {
+//                String line = lines.get(i);
+//                String[] split = line.split(",");
+//
+//
+//                String storedWorld = split[0];
+//
+//                if (!storedWorld.equals(islandName)) {
+//                    updatedLines.add(line);
+//                }
+//
+//            }
+//
+//            Files.write(
+//                    csvFile.toPath(),
+//                    updatedLines,
+//                    StandardCharsets.UTF_8
+//            );
 
             return true;
         } catch (Exception e) {
