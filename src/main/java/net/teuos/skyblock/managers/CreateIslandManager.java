@@ -7,6 +7,8 @@ import com.infernalsuite.asp.api.world.SlimeWorld;
 import com.infernalsuite.asp.api.world.SlimeWorldInstance;
 import com.infernalsuite.asp.api.world.properties.SlimeProperties;
 import com.infernalsuite.asp.api.world.properties.SlimePropertyMap;
+import com.sk89q.worldguard.WorldGuard;
+import net.teuos.skyblock.libs.CSVInteract;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -25,13 +27,20 @@ public class CreateIslandManager {
     private final File csvFile;
     private final SlimeLoader loader;
     private final AdvancedSlimePaperAPI api;
+    private final WorldGuard worldGuard;
+    private final IslandPermissionsManager permissionsManager;
+    private final CSVInteract csvInteract;
+    private final IslandLevelManager islandLevelManager;
 
 
-
-    public CreateIslandManager(File csvFile, SlimeLoader loader) {
+    public CreateIslandManager(File csvFile, SlimeLoader loader, WorldGuard worldGuard, IslandPermissionsManager permissionsManager, CSVInteract csvInteract, IslandLevelManager islandLevelManager) {
         this.csvFile = csvFile;
         this.loader = loader;
+        this.worldGuard = worldGuard;
         this.api = AdvancedSlimePaperAPI.instance();
+        this.permissionsManager = permissionsManager;
+        this.csvInteract = csvInteract;
+        this.islandLevelManager = islandLevelManager;
     }
 
     public boolean createIsland(String islandName) {
@@ -55,17 +64,16 @@ public class CreateIslandManager {
 
             api.saveWorld(island);
 
-            api.loadWorld(island, true);
+            loadIsland(islandName);
 
             World world = Bukkit.getWorld(islandName);
-            if (world != null) {
-                world.getWorldBorder().setSize(30);
-            }
 
             List<String> lines = Files.readAllLines(this.csvFile.toPath(), StandardCharsets.UTF_8);
             List<String> updatedLines = new ArrayList<>(lines);
             updatedLines.add(islandName + ",0,0");
             Files.write(csvFile.toPath(), updatedLines);
+
+            permissionsManager.applyDefaultFlags(world, islandName);
 
             return true;
 
@@ -161,11 +169,13 @@ public class CreateIslandManager {
         }
     }
 
-    public boolean teleportIsland(String worldName)throws IOException {
+    public boolean loadIsland(String worldName)throws IOException {
         try {
             if (Bukkit.getWorld(worldName) == null) {
-                SlimeWorld world = api.readWorld(loader, worldName, false, new SlimePropertyMap());
-                api.loadWorld(world, true);
+                SlimeWorld slimeWorld = api.readWorld(loader, worldName, false, new SlimePropertyMap());
+                api.loadWorld(slimeWorld, true);
+                World world = Bukkit.getWorld(worldName);
+                world.getWorldBorder().setSize(islandLevelManager.getBorderSize(worldName));
             }
             return true;
         } catch (Exception e){

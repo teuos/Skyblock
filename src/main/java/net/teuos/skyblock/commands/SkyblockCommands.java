@@ -2,6 +2,7 @@ package net.teuos.skyblock.commands;
 
 import net.teuos.skyblock.managers.CreateIslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
+import net.teuos.skyblock.managers.IslandPermissionsManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -19,11 +20,13 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
 
     private final IslandLevelManager levelManager;
     private final CreateIslandManager islandManager;
+    private final IslandPermissionsManager islandPermissionsManager;
 
 
-    public SkyblockCommands(IslandLevelManager levelManager, CreateIslandManager islandManager) {
+    public SkyblockCommands(IslandLevelManager levelManager, CreateIslandManager islandManager, IslandPermissionsManager islandPermissionsManager) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
+        this.islandPermissionsManager = islandPermissionsManager;
     }
 
 
@@ -44,7 +47,7 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
 
             if (args[1].equalsIgnoreCase("teleport")){
                 try {
-                    if (islandManager.teleportIsland("skyblock_template")) {
+                    if (islandManager.loadIsland("skyblock_template")) {
                         World target = Bukkit.getWorld("skyblock_template");
                         player.teleport(target.getSpawnLocation());
                         player.sendMessage(ChatColor.GREEN + "Teleported to skyblock_template!");
