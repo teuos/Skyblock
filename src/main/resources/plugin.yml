@@ -1,10 +1,14 @@
 name: Skyblock
-version: '1.1'
+version: '1.2'
 main: net.teuos.skyblock.Skyblock
 api-version: '1.21'
 authors: [ teuos ]
 description: A skyblock core plugin
+depend:
+  - WorldGuard
 commands:
+  is:
+    description: Skyblock island commands
   island:
     description: Skyblock island commands
   sb:
