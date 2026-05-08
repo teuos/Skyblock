@@ -18,6 +18,54 @@
   - delete - Allows an admin to delete the template island
   - teleport - Allows an admin to teleport the template island
 
+### Permissions:
+  - skyblock.island.help:
+    - description: Allows display of help menu for the skyblock command
+    - default: true
+  - skyblock.island.create:
+    - description: Allows creating islands
+    - default: true
+  - skyblock.island.delete:
+    - description: Allows deleting islands
+    - default: true
+  - skyblock.island.visit:
+    - description: Allows visiting islands
+    - default: true
+  - skyblock.island.teleport:
+    - description: Allows teleporting to own island
+    - default: true
+  - skyblock.island.trust:
+    - description: Allows trusting others on their island
+    - default: true
+  - skyblock.island.untrust:
+    - description: Allows removing trust of others on their island
+    - default: true
+  - skyblock.island.upgrade:
+    - description: Allows the ability to level up their island
+    - default: true
+  - skyblock.island.upgrade.generator:
+    - description: Allows the ability to level up their generator
+    - default: true
+  - skyblock.island.upgrade.border:
+    - description: Allows the ability to level up their world border
+    - default: true
+  - skyblock.reload:
+    - description: Allows reloading the plugin
+    - default: op
+  - skyblock.template.create:
+    - description: Allows creation of the template island
+    - default: op
+  - skyblock.template.delete:
+    - description: Allows deletion of the template island
+    - default: op
+  - skyblock.template.teleport:
+    - description: Allows teleportation to the template island
+    - default: op
+  - skyblock.admin:
+    - description: Full admin access
+    - default: op
+
+
 ## Dependencies
 This plugin requires being on an AdvancedSlimePaper server jar.<br>
 https://infernalsuite.com/download/asp<br>

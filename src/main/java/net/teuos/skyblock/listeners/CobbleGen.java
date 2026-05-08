@@ -1,6 +1,6 @@
-package net.teuos.skyblock;
+package net.teuos.skyblock.listeners;
 
-import net.teuos.skyblock.libs.CSVInteract;
+import net.teuos.skyblock.libs.CSVLibs;
 import net.teuos.skyblock.managers.IslandLevelManager;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -12,18 +12,18 @@ import java.io.IOException;
 public class CobbleGen implements Listener {
 
     private final IslandLevelManager levelManager;
-    private final CSVInteract csvInteract;
+    private final CSVLibs csvLibs;
 
-    public CobbleGen(IslandLevelManager levelManager, CSVInteract csvInteract) {
+    public CobbleGen(IslandLevelManager levelManager, CSVLibs csvLibs) {
         this.levelManager = levelManager;
-        this.csvInteract = csvInteract;
+        this.csvLibs = csvLibs;
     }
 
 
     @EventHandler
     public void onBlockFormEvent(BlockFormEvent event) throws IOException {
         if (event.getNewState().getType() == Material.COBBLESTONE) {
-            if (csvInteract.getGenLevel(event.getNewState().getLocation().getWorld().getName()) >= 1) {
+            if (csvLibs.getGenLevel(event.getNewState().getLocation().getWorld().getName()) >= 1) {
                 event.getNewState().setType(Material.IRON_ORE);
             }
             else {

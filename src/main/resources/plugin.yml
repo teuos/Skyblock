@@ -1,5 +1,5 @@
 name: Skyblock
-version: '1.2'
+version: '1.3'
 main: net.teuos.skyblock.Skyblock
 api-version: '1.21'
 authors: [ teuos ]
@@ -15,3 +15,65 @@ commands:
     description: Skyblock plugin commands
   skyblock:
     description: Skyblock plugin commands
+
+permissions:
+
+  skyblock.island.help:
+    description: Allows display of help menu for the skyblock command
+    default: true
+
+  skyblock.island.create:
+    description: Allows creating islands
+    default: true
+
+  skyblock.island.delete:
+    description: Allows deleting islands
+    default: true
+
+  skyblock.island.visit:
+    description: Allows visiting islands
+    default: true
+
+  skyblock.island.teleport:
+    description: Allows teleporting to own island
+    default: true
+
+  skyblock.island.trust:
+    description: Allows trusting others on their island
+    default: true
+
+  skyblock.island.untrust:
+    description: Allows removing trust of others on their island
+    default: true
+
+  skyblock.island.upgrade:
+    description: Allows the ability to level up their island
+    default: true
+
+  skyblock.island.upgrade.generator:
+    description: Allows the ability to level up their generator
+    default: true
+
+  skyblock.island.upgrade.border:
+    description: Allows the ability to level up their world border
+    default: true
+
+  skyblock.reload:
+    description: Allows reloading the plugin
+    default: op
+
+  skyblock.template.create:
+    description: Allows creation of the template island
+    default: op
+
+  skyblock.template.delete:
+    description: Allows deletion of the template island
+    default: op
+
+  skyblock.template.teleport:
+    description: Allows teleportation to the template island
+    default: op
+
+  skyblock.admin:
+    description: Full admin access
+    default: op

@@ -7,6 +7,7 @@ import com.infernalsuite.asp.api.world.SlimeWorld;
 import com.infernalsuite.asp.api.world.properties.SlimeProperties;
 import com.infernalsuite.asp.api.world.properties.SlimePropertyMap;
 import com.sk89q.worldguard.WorldGuard;
+import net.teuos.skyblock.Skyblock;
 import net.teuos.skyblock.libs.CSVLibs;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,12 +17,8 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
-public class CreateIslandManager {
+public class IslandManager {
 
     private final File csvFile;
     private final SlimeLoader loader;
@@ -30,9 +27,9 @@ public class CreateIslandManager {
     private final IslandPermissionsManager permissionsManager;
     private final CSVLibs csvLibs;
     private final IslandLevelManager islandLevelManager;
+    private final Skyblock plugin;
 
-
-    public CreateIslandManager(File csvFile, SlimeLoader loader, WorldGuard worldGuard, IslandPermissionsManager permissionsManager, CSVLibs csvLibs, IslandLevelManager islandLevelManager) {
+    public IslandManager(File csvFile, SlimeLoader loader, WorldGuard worldGuard, IslandPermissionsManager permissionsManager, CSVLibs csvLibs, IslandLevelManager islandLevelManager, Skyblock plugin) {
         this.csvFile = csvFile;
         this.loader = loader;
         this.worldGuard = worldGuard;
@@ -40,6 +37,7 @@ public class CreateIslandManager {
         this.permissionsManager = permissionsManager;
         this.csvLibs = csvLibs;
         this.islandLevelManager = islandLevelManager;
+        this.plugin = plugin;
     }
 
     public boolean createIsland(String islandName) {
@@ -67,12 +65,11 @@ public class CreateIslandManager {
 
             World world = Bukkit.getWorld(islandName);
 
-            csvLibs.createRecord(islandName,0,0);
+            csvLibs.createRecord(islandName,plugin.getConfig().getInt("island.default-generator-level"),plugin.getConfig().getInt("island.default-generator-level"));
 
             permissionsManager.applyDefaultFlags(world, islandName);
 
             return true;
-
 
 
         } catch (Exception e) {
@@ -100,36 +97,9 @@ public class CreateIslandManager {
                 }
             }
 
-
-
             loader.deleteWorld(islandName);
 
             csvLibs.deleteRecord(islandName);
-
-//            List<String> lines = Files.readAllLines(this.csvFile.toPath(), StandardCharsets.UTF_8);
-//            List<String> updatedLines = new ArrayList<>();
-//
-//            updatedLines.add(lines.get(0));
-//
-//
-//            for (int i = 1; i < lines.size(); i++) {
-//                String line = lines.get(i);
-//                String[] split = line.split(",");
-//
-//
-//                String storedWorld = split[0];
-//
-//                if (!storedWorld.equals(islandName)) {
-//                    updatedLines.add(line);
-//                }
-//
-//            }
-//
-//            Files.write(
-//                    csvFile.toPath(),
-//                    updatedLines,
-//                    StandardCharsets.UTF_8
-//            );
 
             return true;
         } catch (Exception e) {
@@ -167,13 +137,26 @@ public class CreateIslandManager {
         }
     }
 
+
+    public void updateWorldBorder(String worldName) throws IOException {
+
+        try {
+            if (Bukkit.getWorld(worldName) != null) {
+                World world = Bukkit.getWorld(worldName);
+                world.getWorldBorder().setSize(islandLevelManager.getBorderSize(worldName));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
     public boolean loadIsland(String worldName)throws IOException {
         try {
             if (Bukkit.getWorld(worldName) == null) {
                 SlimeWorld slimeWorld = api.readWorld(loader, worldName, false, new SlimePropertyMap());
                 api.loadWorld(slimeWorld, true);
-                World world = Bukkit.getWorld(worldName);
-                world.getWorldBorder().setSize(islandLevelManager.getBorderSize(worldName));
+                updateWorldBorder(worldName);
             }
             return true;
         } catch (Exception e){

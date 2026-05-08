@@ -11,6 +11,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import net.teuos.skyblock.Skyblock;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
@@ -22,12 +23,13 @@ public class IslandPermissionsManager {
     private final SlimeLoader loader;
     private final WorldGuard worldGuard;
     private final AdvancedSlimePaperAPI api;
+    private final Skyblock plugin;
 
-    public IslandPermissionsManager(SlimeLoader loader, WorldGuard worldGuard) {
+    public IslandPermissionsManager(SlimeLoader loader, WorldGuard worldGuard, Skyblock plugin) {
         this.loader = loader;
         this.worldGuard = worldGuard;
         this.api = AdvancedSlimePaperAPI.instance();
-
+        this.plugin = plugin;
     }
 
 
