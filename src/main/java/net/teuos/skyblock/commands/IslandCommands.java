@@ -8,16 +8,19 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Island implements CommandExecutor {
+public class IslandCommands implements CommandExecutor, TabCompleter {
 
     private final IslandLevelManager levelManager;
     private final CreateIslandManager islandManager;
 
-    public Island(IslandLevelManager levelManager, CreateIslandManager islandManager) {
+    public IslandCommands(IslandLevelManager levelManager, CreateIslandManager islandManager) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
     }
@@ -39,9 +42,11 @@ public class Island implements CommandExecutor {
         }
 
         if (args[0].equalsIgnoreCase("help")){
-            sender.sendMessage(ChatColor.BLUE + "-- Skyblock island help --");
-            sender.sendMessage(ChatColor.BLUE + "[/island create] - Create a Skyblock island.");
-            sender.sendMessage(ChatColor.BLUE + "[/island level] - level your Skyblock island.");
+            sender.sendMessage(ChatColor.GOLD + "-- Skyblock island help --");
+            sender.sendMessage(ChatColor.YELLOW + "[/island create] - Create your Skyblock island.");
+            sender.sendMessage(ChatColor.YELLOW + "[/island delete] - Delete your Skyblock island.");
+            sender.sendMessage(ChatColor.YELLOW + "[/island teleport] - Teleport to your Skyblock island.");
+            sender.sendMessage(ChatColor.YELLOW + "[/island level] - level your Skyblock island.");
         }
 
         if (args[0].equalsIgnoreCase("create")){
@@ -49,19 +54,28 @@ public class Island implements CommandExecutor {
         }
 
         if (args[0].equalsIgnoreCase("level")){
-            World world = player.getWorld();
 
             if (args[1].equalsIgnoreCase("generator")){
 
                 try {
-                    int level = levelManager.increaseGenLevel(world.getName());
-                    player.sendMessage(ChatColor.GREEN + "Generator level is now " + level + "!");
+                    int level = levelManager.increaseGenLevel(player.getUniqueId().toString());
+                    player.sendMessage(ChatColor.GREEN + "Your generator level is now " + level + "!");
                 } catch (IOException e){
                     player.sendMessage(ChatColor.RED + "Failed to upgrade level. If you believe this to be a mistake please report the issue!");
                     e.printStackTrace();
                 }
 
+            }
 
+            if (args[1].equalsIgnoreCase("border")){
+                try {
+                    int level = levelManager.increaseBorderLevel(player.getUniqueId().toString());
+                    double size = levelManager.getBorderSize(player.getUniqueId().toString());
+                    player.sendMessage(ChatColor.GREEN + "Your border level is now " + level + " and is  " + size + "!");
+                } catch (IOException e){
+                    player.sendMessage(ChatColor.RED + "Failed to upgrade level. If you believe this to be a mistake please report the issue!");
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -107,28 +121,39 @@ public class Island implements CommandExecutor {
         }
 
 
-        if (args[0].equalsIgnoreCase("template")) {
-            if (args[1].equalsIgnoreCase("create")){
-                islandManager.createTemplate(player);
-            }
 
-            if (args[1].equalsIgnoreCase("teleport")){
-                try {
-                    if (islandManager.teleportIsland("skyblock_template")) {
-                        World target = Bukkit.getWorld("skyblock_template");
-                        player.teleport(target.getSpawnLocation());
-                        player.sendMessage(ChatColor.GREEN + "Teleported to skyblock_template!");
-                    }
-                } catch (IOException e) {
-                    player.sendMessage(ChatColor.RED + "Failed to teleport skyblock_template!");
-                    throw new RuntimeException(e);
-                }
-            }
-
-        }
 
 
         return true;
     }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender,
+                                      Command command,
+                                      String alias,
+                                      String[] args) {
+        List<String> completions = new ArrayList<>();
+        if (args.length == 1) {
+            completions.add("create");
+            completions.add("delete");
+            completions.add("level");
+            completions.add("teleport");
+            completions.add("help");
+
+            return completions;
+        }
+
+        if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("level")) {
+                completions.add("generator");
+                completions.add("border");
+            }
+
+            return completions;
+        }
+
+        return completions;
+    }
+
 
 }

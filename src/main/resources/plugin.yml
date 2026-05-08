@@ -7,3 +7,7 @@ description: A skyblock core plugin
 commands:
   island:
     description: Skyblock island commands
+  sb:
+    description: Skyblock plugin commands
+  skyblock:
+    description: Skyblock plugin commands

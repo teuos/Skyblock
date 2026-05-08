@@ -1,6 +1,5 @@
 package net.teuos.skyblock;
 
-import net.teuos.skyblock.commands.Island;
 import net.teuos.skyblock.managers.IslandLevelManager;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
