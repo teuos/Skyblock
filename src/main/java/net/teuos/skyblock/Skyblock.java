@@ -1,5 +1,8 @@
 package net.teuos.skyblock;
 
+import com.infernalsuite.asp.api.AdvancedSlimePaperAPI;
+import com.infernalsuite.asp.api.loaders.SlimeLoader;
+import com.infernalsuite.asp.loaders.file.FileLoader;
 import net.teuos.skyblock.commands.Island;
 import net.teuos.skyblock.managers.CreateIslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
@@ -12,25 +15,36 @@ import java.util.List;
 
 public final class Skyblock extends JavaPlugin {
 
+    private SlimeLoader worldLoader;
+    private final AdvancedSlimePaperAPI api = AdvancedSlimePaperAPI.instance();
+
     private File islandLevelFile;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
 
-
-        System.out.println("Skyblock is enabled");
+        File islandsFolder = new File(getDataFolder(), "islands");
 
 
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
         }
 
+        if(!islandsFolder.exists()){
+            islandsFolder.mkdir();
+        }
+
+        worldLoader = new FileLoader(islandsFolder);
+
         islandLevelFile = new File(getDataFolder(), "island_levels.csv");
 
         IslandLevelManager levelManager = new IslandLevelManager(islandLevelFile);
 
-        CreateIslandManager islandManager = new CreateIslandManager(islandLevelFile);
+        CreateIslandManager islandManager = new CreateIslandManager(islandLevelFile, worldLoader);
+
+
+        System.out.println("Skyblock is enabled");
 
 
         try {
