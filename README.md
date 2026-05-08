@@ -19,9 +19,13 @@
   - teleport - Allows an admin to teleport the template island
 
 ## Dependencies
-This plugin requires AdvancedSlimePaper.<br>
+This plugin requires being on an AdvancedSlimePaper server jar.<br>
 https://infernalsuite.com/download/asp<br>
-The server jar must be ASP and the plugin must also be installed.<br>
+#### Required Plugins:
+World Guard - https://dev.bukkit.org/projects/worldguard/files 7.0.15 or newer<br>
+Advanced Slime Paper - https://infernalsuite.com/download/asp/
+
+
 
 ## Notes
 
