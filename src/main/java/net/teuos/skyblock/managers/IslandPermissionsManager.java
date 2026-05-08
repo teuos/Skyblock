@@ -53,6 +53,7 @@ public class IslandPermissionsManager {
         global.setFlag(Flags.OTHER_EXPLOSION, StateFlag.State.DENY);
         global.setFlag(Flags.DAMAGE_ANIMALS, StateFlag.State.DENY);
         global.setFlag(Flags.FIRE_SPREAD, StateFlag.State.DENY);
+        global.setFlag(Flags.LAVA_FIRE, StateFlag.State.DENY);
 
         global.setFlag(Flags.CHEST_ACCESS, StateFlag.State.ALLOW);
         global.setFlag(Flags.CHEST_ACCESS.getRegionGroupFlag(), RegionGroup.OWNERS);
