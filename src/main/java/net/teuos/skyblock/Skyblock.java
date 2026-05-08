@@ -3,7 +3,8 @@ package net.teuos.skyblock;
 import com.infernalsuite.asp.api.AdvancedSlimePaperAPI;
 import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.loaders.file.FileLoader;
-import net.teuos.skyblock.commands.Island;
+import net.teuos.skyblock.commands.IslandCommands;
+import net.teuos.skyblock.commands.SkyblockCommands;
 import net.teuos.skyblock.managers.CreateIslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -65,7 +66,9 @@ public final class Skyblock extends JavaPlugin {
         // Register CobbleGen
         getServer().getPluginManager().registerEvents(new CobbleGen(levelManager), this);
 
-        getCommand("island").setExecutor(new Island(levelManager, islandManager));
+        getCommand("island").setExecutor(new IslandCommands(levelManager, islandManager));
+        getCommand("sb").setExecutor(new SkyblockCommands(levelManager, islandManager));
+        getCommand("skyblock").setExecutor(new SkyblockCommands(levelManager, islandManager));
 
 
     }

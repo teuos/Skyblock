@@ -9,10 +9,16 @@ import com.infernalsuite.asp.api.world.properties.SlimeProperties;
 import com.infernalsuite.asp.api.world.properties.SlimePropertyMap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CreateIslandManager {
 
@@ -51,7 +57,19 @@ public class CreateIslandManager {
 
             api.loadWorld(island, true);
 
+            World world = Bukkit.getWorld(islandName);
+            if (world != null) {
+                world.getWorldBorder().setSize(30);
+            }
+
+            List<String> lines = Files.readAllLines(this.csvFile.toPath(), StandardCharsets.UTF_8);
+            List<String> updatedLines = new ArrayList<>(lines);
+            updatedLines.add(islandName + ",0,0");
+            Files.write(csvFile.toPath(), updatedLines);
+
             return true;
+
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,12 +82,48 @@ public class CreateIslandManager {
 
 
         try {
-            try {
-                Bukkit.unloadWorld(islandName, false);
-            } catch (Exception ignored) {
+
+            World world = Bukkit.getWorld(islandName);
+
+            if (world != null) {
+                for (Player player : world.getPlayers()) {
+                    player.teleport(Bukkit.getWorld("world").getSpawnLocation());
+                }
+
+                try {
+                    Bukkit.unloadWorld(islandName, false);
+                } catch (Exception ignored) {
+                }
             }
 
+
+
             loader.deleteWorld(islandName);
+
+            List<String> lines = Files.readAllLines(this.csvFile.toPath(), StandardCharsets.UTF_8);
+            List<String> updatedLines = new ArrayList<>();
+
+            updatedLines.add(lines.get(0));
+
+
+            for (int i = 1; i < lines.size(); i++) {
+                String line = lines.get(i);
+                String[] split = line.split(",");
+
+
+                String storedWorld = split[0];
+
+                if (!storedWorld.equals(islandName)) {
+                    updatedLines.add(line);
+                }
+
+            }
+
+            Files.write(
+                    csvFile.toPath(),
+                    updatedLines,
+                    StandardCharsets.UTF_8
+            );
 
             return true;
         } catch (Exception e) {
