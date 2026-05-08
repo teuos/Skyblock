@@ -1,0 +1,16 @@
+island:
+
+  # What should the default world border size be?
+  default-border-size: 30
+
+  # By how much should the world border increase per level?
+  increase-border-amount: 20
+
+  # What level should players start at when making a new island?
+  # Recommend leaving this at 0.
+  default-border-level: 0
+  default-generator-level: 0
+
+messages:
+  # What should the plugin messages be prefixed with?
+  prefix: "&6[Skyblock]"
