@@ -55,6 +55,10 @@
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>is-snapshots</id>
+            <url>https://repo.infernalsuite.com/repository/maven-snapshots/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -63,6 +67,17 @@
             <artifactId>spigot-api</artifactId>
             <version>1.21.11-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.infernalsuite.asp</groupId>
+            <artifactId>api</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.infernalsuite.asp</groupId>
+            <artifactId>file-loader</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
