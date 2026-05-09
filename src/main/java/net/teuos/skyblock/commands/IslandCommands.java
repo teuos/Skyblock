@@ -298,7 +298,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             completions.add("create");
             completions.add("delete");
-            completions.add("level");
+            completions.add("upgrade");
             completions.add("teleport");
             completions.add("help");
             completions.add("visit");

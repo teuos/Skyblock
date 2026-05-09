@@ -18,7 +18,7 @@
   - delete - Allows an admin to delete the template island
   - teleport - Allows an admin to teleport the template island
 
-### Permissions:
+## Permissions:
   - skyblock.island.help:
     - description: Allows display of help menu for the skyblock command
     - default: true
@@ -49,16 +49,16 @@
   - skyblock.island.upgrade.border:
     - description: Allows the ability to level up their world border
     - default: true
-  - skyblock.reload:
+  - skyblock.command.reload:
     - description: Allows reloading the plugin
     - default: op
-  - skyblock.template.create:
+  - skyblock.command.template.create:
     - description: Allows creation of the template island
     - default: op
-  - skyblock.template.delete:
+  - skyblock.command.template.delete:
     - description: Allows deletion of the template island
     - default: op
-  - skyblock.template.teleport:
+  - skyblock.command.template.teleport:
     - description: Allows teleportation to the template island
     - default: op
   - skyblock.admin:

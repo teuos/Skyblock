@@ -47,14 +47,14 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
 
         if (args[0].equalsIgnoreCase("template")) {
 
-            if (!player.hasPermission("skyblock.template.create") && !player.hasPermission("skyblock.admin")) {
+            if (!player.hasPermission("skyblock.command.template.create") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
                 return true;
             }
 
             if (args[1].equalsIgnoreCase("create")){
 
-                if (!player.hasPermission("skyblock.template.create") && !player.hasPermission("skyblock.admin")) {
+                if (!player.hasPermission("skyblock.command.template.create") && !player.hasPermission("skyblock.admin")) {
                     messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
                     return true;
                 }
@@ -64,7 +64,7 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
 
             if (args[1].equalsIgnoreCase("teleport")){
 
-                if (!player.hasPermission("skyblock.template.teleport") && !player.hasPermission("skyblock.admin")) {
+                if (!player.hasPermission("skyblock.command.template.teleport") && !player.hasPermission("skyblock.admin")) {
                     messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
                     return true;
                 }
@@ -85,7 +85,7 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
 
         if (args[0].equalsIgnoreCase("reload")) {
 
-            if (!player.hasPermission("skyblock.reload") && !player.hasPermission("skyblock.admin")) {
+            if (!player.hasPermission("skyblock.command.reload") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
                 return true;
             }
@@ -103,11 +103,19 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                                       Command command,
                                       String alias,
                                       String[] args) {
+
+        if (!(sender instanceof Player)) {
+            return new ArrayList<>();
+        }
+
+        if (!sender.hasPermission("skyblock.command.*")) {
+
+        }
+
         List<String> completions = new ArrayList<>();
         if (args.length == 1) {
-            completions.add("template");
-            completions.add("reload");
-
+            if (sender.hasPermission("skyblock.command.template.*")) {completions.add("template");}
+            if (sender.hasPermission("skyblock.command.reload")) {completions.add("reload");}
             return completions;
         }
 
