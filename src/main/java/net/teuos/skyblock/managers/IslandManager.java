@@ -4,38 +4,36 @@ package net.teuos.skyblock.managers;
 import com.infernalsuite.asp.api.AdvancedSlimePaperAPI;
 import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.api.world.SlimeWorld;
+import com.infernalsuite.asp.api.world.SlimeWorldInstance;
 import com.infernalsuite.asp.api.world.properties.SlimeProperties;
 import com.infernalsuite.asp.api.world.properties.SlimePropertyMap;
 import com.sk89q.worldguard.WorldGuard;
 import net.teuos.skyblock.Skyblock;
-import net.teuos.skyblock.libs.CSVLibs;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 
-import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class IslandManager {
 
-    private final File csvFile;
     private final SlimeLoader loader;
     private final AdvancedSlimePaperAPI api;
     private final WorldGuard worldGuard;
     private final IslandPermissionsManager permissionsManager;
-    private final CSVLibs csvLibs;
+    private final IslandDataManager islandDataManager;
     private final IslandLevelManager islandLevelManager;
     private final Skyblock plugin;
 
-    public IslandManager(File csvFile, SlimeLoader loader, WorldGuard worldGuard, IslandPermissionsManager permissionsManager, CSVLibs csvLibs, IslandLevelManager islandLevelManager, Skyblock plugin) {
-        this.csvFile = csvFile;
+    public IslandManager(SlimeLoader loader, WorldGuard worldGuard, IslandPermissionsManager permissionsManager, IslandDataManager islandDataManager, IslandLevelManager islandLevelManager, Skyblock plugin) {
         this.loader = loader;
         this.worldGuard = worldGuard;
         this.api = AdvancedSlimePaperAPI.instance();
         this.permissionsManager = permissionsManager;
-        this.csvLibs = csvLibs;
+        this.islandDataManager = islandDataManager;
         this.islandLevelManager = islandLevelManager;
         this.plugin = plugin;
     }
@@ -65,7 +63,9 @@ public class IslandManager {
 
             World world = Bukkit.getWorld(islandName);
 
-            csvLibs.createRecord(islandName,plugin.getConfig().getInt("island.default-generator-level"),plugin.getConfig().getInt("island.default-generator-level"));
+            long now = System.currentTimeMillis();
+
+            islandDataManager.createRecord(islandName);
 
             permissionsManager.applyDefaultFlags(world, islandName);
 
@@ -99,7 +99,7 @@ public class IslandManager {
 
             loader.deleteWorld(islandName);
 
-            csvLibs.deleteRecord(islandName);
+            islandDataManager.deleteRecord(islandName);
 
             return true;
         } catch (Exception e) {
@@ -150,6 +150,82 @@ public class IslandManager {
         }
 
     }
+
+
+    public void unloadIsland(String islandName) {
+        Bukkit.unloadWorld(islandName, true);
+    }
+
+
+    public void startActivityChecker() {
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+
+            long now = System.currentTimeMillis();
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+
+                String worldName = player.getWorld().getName();
+
+                if (islandDataManager.islandExists(worldName)) {
+
+                    islandDataManager.updateLastActive(
+                            worldName,
+                            now
+                    );
+                }
+            }
+
+        }, 20L * 60L, 20L * 60L);
+    }
+
+
+    public void startIslandUnloadTask() {
+
+        if (plugin.getConfig().getLong("island-unload-task") < 0) {
+            return;
+        }
+
+        startActivityChecker();
+
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+
+            long now = System.currentTimeMillis();
+
+            for (String islandID : islandDataManager.getAllIslands()) {
+
+                World world = Bukkit.getWorld(islandID);
+
+                if (world == null) {
+                    continue;
+                }
+
+                if (!world.getPlayers().isEmpty()) {
+                    islandDataManager.updateLastActive(
+                            islandID,
+                            now
+                    );
+                    continue;
+                }
+
+                long lastActive = islandDataManager.getLastActive(islandID);
+
+                long inactiveTime = System.currentTimeMillis() - lastActive;
+
+                long timer = plugin.getConfig().getLong("islands.unload-delay") * 1000;
+
+                if (inactiveTime >= timer) {
+
+                    unloadIsland(islandID);
+
+                    plugin.getLogger().info(
+                            "Unloaded inactive island" + islandID
+                    );
+
+                }
+            }
+        }, 20L * 60L, 20L * 60);
+    }
+
 
     public boolean loadIsland(String worldName)throws IOException {
         try {

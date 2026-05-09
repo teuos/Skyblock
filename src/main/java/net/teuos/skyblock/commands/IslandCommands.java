@@ -1,7 +1,7 @@
 package net.teuos.skyblock.commands;
 
-import net.teuos.skyblock.libs.CSVLibs;
 import net.teuos.skyblock.libs.MessageLibs;
+import net.teuos.skyblock.managers.IslandDataManager;
 import net.teuos.skyblock.managers.IslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
 import net.teuos.skyblock.managers.IslandPermissionsManager;
@@ -24,15 +24,15 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
     private final IslandLevelManager levelManager;
     private final IslandManager islandManager;
     private final IslandPermissionsManager islandPermissionsManager;
-    private final CSVLibs csvLibs;
+    private final IslandDataManager islandDataManager;
     private final MessageLibs messageLibs;
 
 
-    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, CSVLibs csvLibs, MessageLibs messageLibs) {
+    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
         this.islandPermissionsManager = islandPermissionsManager;
-        this.csvLibs = csvLibs;
+        this.islandDataManager = islandDataManager;
         this.messageLibs = messageLibs;
     }
 
@@ -76,7 +76,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
             if (args[1].equalsIgnoreCase("generator")){
 
-                if (!player.hasPermission("skyblock.island.generator") && !player.hasPermission("skyblock.admin")) {
+                if (!player.hasPermission("skyblock.island.upgrade.generator") && !player.hasPermission("skyblock.admin")) {
                     messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
                     return true;
                 }
@@ -93,7 +93,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
             if (args[1].equalsIgnoreCase("border")){
 
-                if (!player.hasPermission("skyblock.island.border") && !player.hasPermission("skyblock.admin")) {
+                if (!player.hasPermission("skyblock.island.upgrade.border") && !player.hasPermission("skyblock.admin")) {
                     messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
                     return true;
                 }
@@ -118,7 +118,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            if (csvLibs.IslandExists(player.getUniqueId().toString())){
+            if (islandDataManager.islandExists(player.getUniqueId().toString())){
                 messageLibs.sendMessage(player,ChatColor.RED + "You already have a skyblock island!");
                 return true;
             }
@@ -162,7 +162,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            if (!csvLibs.IslandExists(player.getUniqueId().toString())){
+            if (!islandDataManager.islandExists(player.getUniqueId().toString())){
                 messageLibs.sendMessage(player,ChatColor.RED + "You do not have a skyblock island!");
                 return true;
             }
@@ -197,7 +197,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
             try {
                 String islandOwner = target.getUniqueId().toString();
 
-                if (csvLibs.IslandExists(islandOwner)){
+                if (islandDataManager.islandExists(islandOwner)){
                     try {
                         islandManager.loadIsland(islandOwner);
                         World world = Bukkit.getWorld(islandOwner);
@@ -232,7 +232,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                if (csvLibs.IslandExists(player.getUniqueId().toString())) {
+                if (islandDataManager.islandExists(player.getUniqueId().toString())) {
                     islandManager.loadIsland(player.getUniqueId().toString());
                     World target = Bukkit.getWorld(player.getUniqueId().toString());
 
@@ -265,7 +265,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                if (csvLibs.IslandExists(player.getUniqueId().toString())) {
+                if (islandDataManager.islandExists(player.getUniqueId().toString())) {
                     islandManager.loadIsland(player.getUniqueId().toString());
                     World target = Bukkit.getWorld(player.getUniqueId().toString());
 

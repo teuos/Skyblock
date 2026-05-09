@@ -11,6 +11,10 @@ island:
   default-border-level: 0
   default-generator-level: 0
 
+
+  # How long should the plugin wait (in seconds) before unloading inactive islands? set to -1 to disable
+  unload-delay: 600
+
 messages:
   # What should the plugin messages be prefixed with?
   prefix: "&6[Skyblock]"

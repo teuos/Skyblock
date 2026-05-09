@@ -5,18 +5,15 @@ import com.infernalsuite.asp.loaders.file.FileLoader;
 import com.sk89q.worldguard.WorldGuard;
 import net.teuos.skyblock.commands.IslandCommands;
 import net.teuos.skyblock.commands.SkyblockCommands;
-import net.teuos.skyblock.libs.CSVLibs;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.listeners.CobbleGen;
+import net.teuos.skyblock.managers.IslandDataManager;
 import net.teuos.skyblock.managers.IslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
 import net.teuos.skyblock.managers.IslandPermissionsManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.List;
 
 public final class Skyblock extends JavaPlugin {
 
@@ -24,8 +21,6 @@ public final class Skyblock extends JavaPlugin {
 
     private SlimeLoader worldLoader;
     private WorldGuard worldGuardApi;
-
-    private File islandLevelFile;
 
     @Override
     public void onEnable() {
@@ -54,42 +49,27 @@ public final class Skyblock extends JavaPlugin {
         worldGuardApi = WorldGuard.getInstance();
 
 
-        islandLevelFile = new File(getDataFolder(), "island_levels.csv");
-
-        CSVLibs csvLibs = new CSVLibs(islandLevelFile, this);
+        IslandDataManager islandDataManager =
+                new IslandDataManager(this);
 
         MessageLibs messageLibs = new MessageLibs(this);
 
         IslandPermissionsManager permissionsManager = new IslandPermissionsManager(worldLoader, worldGuardApi, this);
 
-        IslandLevelManager levelManager = new IslandLevelManager(csvLibs, this);
+        IslandLevelManager levelManager = new IslandLevelManager(islandDataManager, this);
 
-        IslandManager islandManager = new IslandManager(islandLevelFile, worldLoader, worldGuardApi, permissionsManager, csvLibs, levelManager, this);
+        IslandManager islandManager = new IslandManager(worldLoader, worldGuardApi, permissionsManager, islandDataManager, levelManager, this);
 
+        islandManager.startIslandUnloadTask();
 
         System.out.println("Skyblock is enabled");
 
 
-        try {
-            if (!islandLevelFile.exists()) {
-                islandLevelFile.createNewFile();
-
-                Files.write(
-                        islandLevelFile.toPath(),
-                        List.of("world,cobblegen,border")
-                );
-
-                System.out.println("Created island_levels.csv");
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         // Register CobbleGen
-        getServer().getPluginManager().registerEvents(new CobbleGen(levelManager, csvLibs), this);
+        getServer().getPluginManager().registerEvents(new CobbleGen(levelManager, islandDataManager), this);
 
         // Register island commands
-        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, csvLibs, messageLibs);
+        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
 
