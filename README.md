@@ -5,12 +5,14 @@
 - create - Allows a user to create an island
 - delete - Allows a user to delete an island
 - teleport - Allows a user to teleport to their island
-- level:
+- upgrade:
   - generator - Will level up a users generators
   - border - Will level up a users world border
 - visit - Allows a user to visit another users island
 - trust - Allows a user to trust another user in their island
 - untrust - Allows a user to untrust another user in their island
+- block - Allows a user to block another user from visiting their island
+- unblock - Allows a user to unblock another user from visiting their island
 
 ### /skyblock:
 - template:
@@ -40,6 +42,12 @@
   - skyblock.island.untrust:
     - description: Allows removing trust of others on their island
     - default: true
+  - skyblock.island.block:
+    - description: Allows blocking a player from visiting an island
+    - default: true
+  - skyblock.island.unblock:
+    - description: Allows unblocking a player from visiting an island
+    - default: true
   - skyblock.island.upgrade:
     - description: Allows the ability to level up their island
     - default: true
@@ -51,6 +59,9 @@
     - default: true
   - skyblock.command.reload:
     - description: Allows reloading the plugin
+    - default: op
+  - skyblock.teleport:
+    - description: Allows user to teleport to other islands regardless of blocked status
     - default: op
   - skyblock.command.template.create:
     - description: Allows creation of the template island

@@ -1,13 +1,16 @@
 package net.teuos.skyblock.managers;
 
 import net.teuos.skyblock.Skyblock;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class IslandDataManager {
 
@@ -51,6 +54,7 @@ public class IslandDataManager {
         islandsConfig.set(path + ".last-active", 0);
         islandsConfig.set(path + ".levels.generator-level", plugin.getConfig().getInt("levels.generator-level"));
         islandsConfig.set(path + ".levels.border-level", plugin.getConfig().getInt("levels.border-level"));
+        islandsConfig.set(path + ".blocked-players", plugin.getConfig().getString("blocked-players"));
 
         save();
 
@@ -73,7 +77,6 @@ public class IslandDataManager {
                 "islands." + islandName + ".levels.border-level",
                 0
         );
-
     }
 
     public int getGenLevel(String islandName) {
@@ -90,6 +93,37 @@ public class IslandDataManager {
                 "islands." + islandName + ".last-active",
                 0
         );
+    }
+
+    public List<String> getBlockedPlayers(String islandName) {
+        return islandsConfig.getStringList("islands." + islandName + ".blocked-players");
+    }
+
+    public boolean getBlockedStatus(String islandName, Player player) {
+        List<String> blockedPlayers = getBlockedPlayers(islandName);
+        return blockedPlayers.contains(player.getUniqueId().toString());
+
+    }
+
+
+    public void addBlockedPlayer(String islandName, Player player) {
+        List<String> blockedPlayers = getBlockedPlayers(islandName);
+        if (!blockedPlayers.contains(player.getUniqueId().toString())) {
+            blockedPlayers.add(player.getUniqueId().toString());
+        }
+        islandsConfig.set(
+                "islands." + islandName + ".blocked-players", blockedPlayers
+        );
+        save();
+    }
+
+    public void removeBlockedPlayer(String islandName, Player player) {
+        List<String> blockedPlayers = getBlockedPlayers(islandName);
+        blockedPlayers.remove(player.getUniqueId().toString());
+        islandsConfig.set(
+                "islands." + islandName + ".blocked-players", blockedPlayers
+        );
+        save();
     }
 
     public void updateBorderLevel(String islandName, int level) {

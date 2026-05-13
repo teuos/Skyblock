@@ -1,5 +1,5 @@
 name: Skyblock
-version: '1.2.3'
+version: '1.2.4'
 main: net.teuos.skyblock.Skyblock
 api-version: '1.21'
 authors: [ teuos ]
@@ -46,6 +46,14 @@ permissions:
     description: Allows removing trust of others on their island
     default: true
 
+  skyblock.island.block:
+    description: Allows blocking a player from visiting an island
+    default: true
+
+  skyblock.island.unblock:
+    description: Allows unblocking a player from visiting an island
+    default: true
+
   skyblock.island.upgrade:
     description: Allows the ability to level up their island
     default: true
@@ -60,6 +68,10 @@ permissions:
 
   skyblock.reload:
     description: Allows reloading the plugin
+    default: op
+
+  skyblock.teleport:
+    description: Allows user to teleport to other islands regardless of blocked status
     default: op
 
   skyblock.template.create:

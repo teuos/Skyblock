@@ -5,9 +5,12 @@ import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -24,12 +27,14 @@ public class IslandPermissionsManager {
     private final WorldGuard worldGuard;
     private final AdvancedSlimePaperAPI api;
     private final Skyblock plugin;
+    private final IslandDataManager islandDataManager;
 
-    public IslandPermissionsManager(SlimeLoader loader, WorldGuard worldGuard, Skyblock plugin) {
+    public IslandPermissionsManager(SlimeLoader loader, WorldGuard worldGuard, Skyblock plugin, IslandDataManager islandDataManager) {
         this.loader = loader;
         this.worldGuard = worldGuard;
         this.api = AdvancedSlimePaperAPI.instance();
         this.plugin = plugin;
+        this.islandDataManager = islandDataManager;
     }
 
 
@@ -51,6 +56,7 @@ public class IslandPermissionsManager {
 
         // Apply default flags
         global.setFlag(Flags.PVP, StateFlag.State.DENY);
+        global.setFlag(Flags.TNT, StateFlag.State.DENY);
         global.setFlag(Flags.CREEPER_EXPLOSION, StateFlag.State.DENY);
         global.setFlag(Flags.OTHER_EXPLOSION, StateFlag.State.DENY);
         global.setFlag(Flags.DAMAGE_ANIMALS, StateFlag.State.DENY);
@@ -100,6 +106,17 @@ public class IslandPermissionsManager {
         global.getMembers().removePlayer(player.getUniqueId());
 
         return !global.getMembers().contains(player.getUniqueId());
+    }
+
+
+    public boolean blockPlayer(Player player, String islandName) {
+        islandDataManager.addBlockedPlayer(islandName, player);
+        return islandDataManager.getBlockedStatus(islandName, player);
+    }
+
+    public boolean unblockPlayer(Player player, String islandName) {
+        islandDataManager.removeBlockedPlayer(islandName, player);
+        return !islandDataManager.getBlockedStatus(islandName, player);
     }
 
 }

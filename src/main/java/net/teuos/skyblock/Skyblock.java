@@ -7,6 +7,7 @@ import net.teuos.skyblock.commands.IslandCommands;
 import net.teuos.skyblock.commands.SkyblockCommands;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.listeners.CobbleGen;
+import net.teuos.skyblock.listeners.TeleportListeners;
 import net.teuos.skyblock.managers.IslandDataManager;
 import net.teuos.skyblock.managers.IslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
@@ -54,7 +55,7 @@ public final class Skyblock extends JavaPlugin {
 
         MessageLibs messageLibs = new MessageLibs(this);
 
-        IslandPermissionsManager permissionsManager = new IslandPermissionsManager(worldLoader, worldGuardApi, this);
+        IslandPermissionsManager permissionsManager = new IslandPermissionsManager(worldLoader, worldGuardApi, this, islandDataManager);
 
         IslandLevelManager levelManager = new IslandLevelManager(islandDataManager, this);
 
@@ -68,13 +69,16 @@ public final class Skyblock extends JavaPlugin {
         // Register CobbleGen
         getServer().getPluginManager().registerEvents(new CobbleGen(levelManager, islandDataManager), this);
 
+        // Register IslandLeave
+        getServer().getPluginManager().registerEvents(new TeleportListeners(islandDataManager), this);
+
         // Register island commands
         IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
 
         // Register skyblock commands
-        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs);
+        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager);
         getCommand("sb").setExecutor(skyblockCommands);
         getCommand("skyblock").setExecutor(skyblockCommands);
 

@@ -197,7 +197,14 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
             try {
                 String islandOwner = target.getUniqueId().toString();
 
+
                 if (islandDataManager.islandExists(islandOwner)){
+
+                    if (islandDataManager.getBlockedStatus(islandOwner, player)) {
+                        messageLibs.sendMessage(player,ChatColor.RED + "You have been blocked from visiting this island, please contact the island owner if you think this is a mistake!");
+                        return true;
+                    }
+
                     try {
                         islandManager.loadIsland(islandOwner);
                         World world = Bukkit.getWorld(islandOwner);
@@ -278,10 +285,57 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                     messageLibs.sendMessage(player,ChatColor.RED +  "you do not have a island!");
                 }
 
-
-
             } catch (IOException e) {
                 messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
+            }
+
+        }
+
+        if (args[0].equalsIgnoreCase("block")) {
+            if (!player.hasPermission("skyblock.island.block") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
+            if (args.length < 2) {
+                player.sendMessage(ChatColor.YELLOW + "Usage: /island block <player>");
+                return true;
+            }
+            if (islandDataManager.islandExists(player.getUniqueId().toString())) {
+                islandDataManager.addBlockedPlayer(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]));
+                if (islandDataManager.getBlockedStatus(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]))) {
+                    messageLibs.sendMessage(player,ChatColor.GREEN + args[1] + " is now blocked from your island!");
+                    if (Bukkit.getPlayer(args[1]).getWorld().equals(Bukkit.getWorld(player.getUniqueId()))) {
+                        Bukkit.getPlayer(args[1]).teleport(Bukkit.getWorld("world").getSpawnLocation());
+                    }
+                }  else {
+                    messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
+                }
+            } else {
+                messageLibs.sendMessage(player,ChatColor.RED +  "you do not have a island!");
+            }
+        }
+
+        if (args[0].equalsIgnoreCase("unblock")) {
+            if (!player.hasPermission("skyblock.island.unblock") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
+            if (args.length < 2) {
+                player.sendMessage(ChatColor.YELLOW + "Usage: /island unblock <player>");
+                return true;
+            }
+
+            if (islandDataManager.islandExists(player.getUniqueId().toString())) {
+                islandDataManager.removeBlockedPlayer(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]));
+                if (!islandDataManager.getBlockedStatus(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]))) {
+                    messageLibs.sendMessage(player, ChatColor.GREEN + args[1] + " is no longer blocked from your island!");
+                } else {
+                    messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
+                }
+            } else {
+                messageLibs.sendMessage(player,ChatColor.RED +  "you do not have a island!");
             }
 
         }
@@ -304,6 +358,8 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
             completions.add("visit");
             completions.add("trust");
             completions.add("untrust");
+            completions.add("block");
+            completions.add("unblock");
 
             return completions;
         }
@@ -330,6 +386,20 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
             }
 
             if (args[0].equalsIgnoreCase("untrust")) {
+                List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+                for (Player p : players) {
+                    completions.add(p.getName());
+                }
+            }
+
+            if (args[0].equalsIgnoreCase("block")) {
+                List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+                for (Player p : players) {
+                    completions.add(p.getName());
+                }
+            }
+
+            if (args[0].equalsIgnoreCase("unblock")) {
                 List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
                 for (Player p : players) {
                     completions.add(p.getName());
