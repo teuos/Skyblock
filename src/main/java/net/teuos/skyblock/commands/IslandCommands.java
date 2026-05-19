@@ -192,7 +192,15 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
             String playerName = args[1];
 
-            OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
+            OfflinePlayer target = Bukkit.getPlayer(playerName);
+
+            if (target == null) {
+                messageLibs.sendMessage(player, ChatColor.RED + "Player " + playerName + " not found!");
+                return true;
+            }
+
+
+            //OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
 
             try {
                 String islandOwner = target.getUniqueId().toString();

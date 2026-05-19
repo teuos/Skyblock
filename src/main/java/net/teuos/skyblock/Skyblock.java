@@ -67,7 +67,7 @@ public final class Skyblock extends JavaPlugin {
 
 
         // Register CobbleGen
-        getServer().getPluginManager().registerEvents(new CobbleGen(levelManager, islandDataManager), this);
+        getServer().getPluginManager().registerEvents(new CobbleGen(levelManager, islandDataManager, this), this);
 
         // Register IslandLeave
         getServer().getPluginManager().registerEvents(new TeleportListeners(islandDataManager), this);
