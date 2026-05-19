@@ -1,7 +1,8 @@
 package net.teuos.skyblock.commands;
 
-import net.teuos.skyblock.libs.CSVInteract;
-import net.teuos.skyblock.managers.CreateIslandManager;
+import net.teuos.skyblock.libs.MessageLibs;
+import net.teuos.skyblock.managers.IslandDataManager;
+import net.teuos.skyblock.managers.IslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
 import net.teuos.skyblock.managers.IslandPermissionsManager;
 import org.bukkit.Bukkit;
@@ -17,21 +18,22 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class IslandCommands implements CommandExecutor, TabCompleter {
 
     private final IslandLevelManager levelManager;
-    private final CreateIslandManager islandManager;
+    private final IslandManager islandManager;
     private final IslandPermissionsManager islandPermissionsManager;
-    private final CSVInteract csvInteract;
+    private final IslandDataManager islandDataManager;
+    private final MessageLibs messageLibs;
 
 
-    public IslandCommands(IslandLevelManager levelManager, CreateIslandManager islandManager, IslandPermissionsManager islandPermissionsManager, CSVInteract csvInteract) {
+    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
         this.islandPermissionsManager = islandPermissionsManager;
-        this.csvInteract = csvInteract;
+        this.islandDataManager = islandDataManager;
+        this.messageLibs = messageLibs;
     }
 
 
@@ -51,35 +53,58 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         }
 
         if (args[0].equalsIgnoreCase("help")){
+
+            if (!player.hasPermission("skyblock.island.help") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
             sender.sendMessage(ChatColor.GOLD + "-- Skyblock island help --");
             sender.sendMessage(ChatColor.YELLOW + "[/island create] - Create your Skyblock island.");
             sender.sendMessage(ChatColor.YELLOW + "[/island delete] - Delete your Skyblock island.");
             sender.sendMessage(ChatColor.YELLOW + "[/island teleport] - Teleport to your Skyblock island.");
-            sender.sendMessage(ChatColor.YELLOW + "[/island level] - level your Skyblock island.");
+            sender.sendMessage(ChatColor.YELLOW + "[/island upgrade] - upgrade your Skyblock island.");
         }
 
 
-        if (args[0].equalsIgnoreCase("level")){
+        if (args[0].equalsIgnoreCase("upgrade")){
+
+            if (!player.hasPermission("skyblock.island.upgrade") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
 
             if (args[1].equalsIgnoreCase("generator")){
 
+                if (!player.hasPermission("skyblock.island.upgrade.generator") && !player.hasPermission("skyblock.admin")) {
+                    messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                    return true;
+                }
+
                 try {
                     int level = levelManager.increaseGenLevel(player.getUniqueId().toString());
-                    player.sendMessage(ChatColor.GREEN + "Your generator level is now " + level + "!");
+                    messageLibs.sendMessage(player,ChatColor.GREEN + "Your generator level is now " + level + "!");
                 } catch (IOException e){
-                    player.sendMessage(ChatColor.RED + "Failed to upgrade level. If you believe this to be a mistake please report the issue!");
+                    messageLibs.sendMessage(player,ChatColor.RED + "Failed to upgrade level. If you believe this to be a mistake please report the issue!");
                     e.printStackTrace();
                 }
 
             }
 
             if (args[1].equalsIgnoreCase("border")){
+
+                if (!player.hasPermission("skyblock.island.upgrade.border") && !player.hasPermission("skyblock.admin")) {
+                    messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                    return true;
+                }
+
                 try {
                     int level = levelManager.increaseBorderLevel(player.getUniqueId().toString());
                     double size = levelManager.getBorderSize(player.getUniqueId().toString());
-                    player.sendMessage(ChatColor.GREEN + "Your border level is now " + level + " and is " + size + "!");
+                    islandManager.updateWorldBorder(player.getUniqueId().toString());
+                    messageLibs.sendMessage(player,ChatColor.GREEN + "Your border level is now " + level + " and is " + size + "!");
                 } catch (IOException e){
-                    player.sendMessage(ChatColor.RED + "Failed to upgrade level. If you believe this to be a mistake please report the issue!");
+                    messageLibs.sendMessage(player,ChatColor.RED + "Failed to upgrade level. If you believe this to be a mistake please report the issue!");
                     e.printStackTrace();
                 }
             }
@@ -88,29 +113,40 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
         if (args[0].equalsIgnoreCase("create")) {
 
-            if (csvInteract.IslandExists(player.getUniqueId().toString())){
-                player.sendMessage(ChatColor.RED + "You already have a skyblock island!");
+            if (!player.hasPermission("skyblock.island.create") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
+            if (islandDataManager.islandExists(player.getUniqueId().toString())){
+                messageLibs.sendMessage(player,ChatColor.RED + "You already have a skyblock island!");
                 return true;
             }
 
             if (islandManager.createIsland(player.getPlayer().getUniqueId().toString())) {
                 World target = Bukkit.getWorld(player.getUniqueId().toString());
                 player.teleport(target.getSpawnLocation());
-                player.sendMessage(ChatColor.GREEN + "Island has been created!");
+                messageLibs.sendMessage(player,ChatColor.GREEN + "Island has been created!");
             } else {
-                player.sendMessage(ChatColor.RED + "Failed to create island!");
+                messageLibs.sendMessage(player,ChatColor.RED + "Failed to create island!");
             }
 
 
         }
 
         if (args[0].equalsIgnoreCase("delete")) {
+
+            if (!player.hasPermission("skyblock.island.delete") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
             if (args.length >= 2 && args[1].equalsIgnoreCase("confirm")){
 
                 if (islandManager.deleteIsland(player.getUniqueId().toString())){
-                    player.sendMessage(ChatColor.GREEN + "Island has been deleted!");
+                    messageLibs.sendMessage(player,ChatColor.GREEN + "Island has been deleted!");
                 } else {
-                    player.sendMessage(ChatColor.RED + "Failed to delete island!");
+                    messageLibs.sendMessage(player,ChatColor.RED + "Failed to delete island!");
                 }
 
             } else {
@@ -121,8 +157,13 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
         if (args[0].equalsIgnoreCase("teleport")) {
 
-            if (!csvInteract.IslandExists(player.getUniqueId().toString())){
-                player.sendMessage(ChatColor.RED + "You do not have a skyblock island!");
+            if (!player.hasPermission("skyblock.island.teleport") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
+            if (!islandDataManager.islandExists(player.getUniqueId().toString())){
+                messageLibs.sendMessage(player,ChatColor.RED + "You do not have a skyblock island!");
                 return true;
             }
 
@@ -130,14 +171,19 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                 islandManager.loadIsland(player.getUniqueId().toString());
                 World target = Bukkit.getWorld(player.getUniqueId().toString());
                 player.teleport(target.getSpawnLocation());
-                player.sendMessage(ChatColor.GREEN + "Teleported to your island!");
+                messageLibs.sendMessage(player,ChatColor.GREEN + "Teleported to your island!");
             } catch (IOException e) {
-                player.sendMessage(ChatColor.RED + "Failed to teleport your island!");
+                messageLibs.sendMessage(player,ChatColor.RED + "Failed to teleport your island!");
                 throw new RuntimeException(e);
             }
         }
 
         if (args[0].equalsIgnoreCase("visit")) {
+
+            if (!player.hasPermission("skyblock.island.visit") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
 
             if (args.length < 2) {
                 player.sendMessage("Usage: /island visit <player>");
@@ -146,28 +192,43 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
             String playerName = args[1];
 
-            OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
+            OfflinePlayer target = Bukkit.getPlayer(playerName);
+
+            if (target == null) {
+                messageLibs.sendMessage(player, ChatColor.RED + "Player " + playerName + " not found!");
+                return true;
+            }
+
+
+            //OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
 
             try {
                 String islandOwner = target.getUniqueId().toString();
 
-                if (csvInteract.IslandExists(islandOwner)){
+
+                if (islandDataManager.islandExists(islandOwner)){
+
+                    if (islandDataManager.getBlockedStatus(islandOwner, player)) {
+                        messageLibs.sendMessage(player,ChatColor.RED + "You have been blocked from visiting this island, please contact the island owner if you think this is a mistake!");
+                        return true;
+                    }
+
                     try {
                         islandManager.loadIsland(islandOwner);
                         World world = Bukkit.getWorld(islandOwner);
                         player.teleport(world.getSpawnLocation());
-                        player.sendMessage(ChatColor.GREEN + "Teleported to " + playerName + "'s island!");
+                        messageLibs.sendMessage(player,ChatColor.GREEN + "Teleported to " + playerName + "'s island!");
                     } catch (IOException e) {
-                        player.sendMessage(ChatColor.RED + "Failed to teleport to " + playerName + "'s island!");
+                        messageLibs.sendMessage(player,ChatColor.RED + "Failed to teleport to " + playerName + "'s island!");
                         throw new RuntimeException(e);
                     }
                 } else {
-                    player.sendMessage(ChatColor.RED + playerName + " does not have a island!");
+                    messageLibs.sendMessage(player,ChatColor.RED + playerName + " does not have a island!");
                 }
 
 
             } catch (IllegalArgumentException e) {
-                player.sendMessage("Invalid Player");
+                messageLibs.sendMessage(player,ChatColor.RED + playerName + " does not exist!");
                 return true;
             }
 
@@ -175,57 +236,114 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
         if (args[0].equalsIgnoreCase("trust")) {
 
+            if (!player.hasPermission("skyblock.island.trust") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
             try {
                 if (args.length < 2) {
-                    player.sendMessage("Usage: /island trust <player>");
+                    player.sendMessage(ChatColor.YELLOW + "Usage: /island trust <player>");
                     return true;
                 }
 
-                if (csvInteract.IslandExists(player.getUniqueId().toString())) {
+                if (islandDataManager.islandExists(player.getUniqueId().toString())) {
                     islandManager.loadIsland(player.getUniqueId().toString());
                     World target = Bukkit.getWorld(player.getUniqueId().toString());
 
                     if (islandPermissionsManager.addMember(Bukkit.getPlayer(args[1]), target)) {
-                        player.sendMessage(ChatColor.GREEN + args[1] + " is now trusted on your island!");
+                        messageLibs.sendMessage(player,ChatColor.GREEN + args[1] + " is now trusted on your island!");
                     } else {
-                        player.sendMessage(ChatColor.RED + "Somthing went wrong!");
+                        messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
                     }
                 } else {
-                    player.sendMessage(ChatColor.RED +  "you do not have a island!");
+                    messageLibs.sendMessage(player,ChatColor.RED +  "You do not have a island!");
                 }
 
 
 
             } catch (IOException e) {
-                player.sendMessage(ChatColor.RED + "Somthing went wrong please report the issue!");
+                messageLibs.sendMessage(player,ChatColor.RED + "Something went wrong!");
             }
         }
 
         if (args[0].equalsIgnoreCase("untrust")) {
 
+            if (!player.hasPermission("skyblock.island.untrust") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
             try {
                 if (args.length < 2) {
-                    player.sendMessage("Usage: /unisland trust <player>");
+                    player.sendMessage(ChatColor.YELLOW + "Usage: /island untrust <player>");
                     return true;
                 }
 
-                if (csvInteract.IslandExists(player.getUniqueId().toString())) {
+                if (islandDataManager.islandExists(player.getUniqueId().toString())) {
                     islandManager.loadIsland(player.getUniqueId().toString());
                     World target = Bukkit.getWorld(player.getUniqueId().toString());
 
                     if (islandPermissionsManager.removeMember(Bukkit.getPlayer(args[1]), target)) {
-                        player.sendMessage(ChatColor.GREEN + args[1] + " is no longer trusted on your island!");
+                        messageLibs.sendMessage(player,ChatColor.GREEN + args[1] + " is no longer trusted on your island!");
                     } else {
-                        player.sendMessage(ChatColor.RED + "Somthing went wrong!");
+                        messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
                     }
                 } else {
-                    player.sendMessage(ChatColor.RED +  "you do not have a island!");
+                    messageLibs.sendMessage(player,ChatColor.RED +  "you do not have a island!");
                 }
 
-
-
             } catch (IOException e) {
-                player.sendMessage(ChatColor.RED + "Somthing went wrong please report the issue!");
+                messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
+            }
+
+        }
+
+        if (args[0].equalsIgnoreCase("block")) {
+            if (!player.hasPermission("skyblock.island.block") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
+            if (args.length < 2) {
+                player.sendMessage(ChatColor.YELLOW + "Usage: /island block <player>");
+                return true;
+            }
+            if (islandDataManager.islandExists(player.getUniqueId().toString())) {
+                islandDataManager.addBlockedPlayer(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]));
+                if (islandDataManager.getBlockedStatus(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]))) {
+                    messageLibs.sendMessage(player,ChatColor.GREEN + args[1] + " is now blocked from your island!");
+                    if (Bukkit.getPlayer(args[1]).getWorld().equals(Bukkit.getWorld(player.getUniqueId()))) {
+                        Bukkit.getPlayer(args[1]).teleport(Bukkit.getWorld("world").getSpawnLocation());
+                    }
+                }  else {
+                    messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
+                }
+            } else {
+                messageLibs.sendMessage(player,ChatColor.RED +  "you do not have a island!");
+            }
+        }
+
+        if (args[0].equalsIgnoreCase("unblock")) {
+            if (!player.hasPermission("skyblock.island.unblock") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
+            if (args.length < 2) {
+                player.sendMessage(ChatColor.YELLOW + "Usage: /island unblock <player>");
+                return true;
+            }
+
+            if (islandDataManager.islandExists(player.getUniqueId().toString())) {
+                islandDataManager.removeBlockedPlayer(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]));
+                if (!islandDataManager.getBlockedStatus(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]))) {
+                    messageLibs.sendMessage(player, ChatColor.GREEN + args[1] + " is no longer blocked from your island!");
+                } else {
+                    messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
+                }
+            } else {
+                messageLibs.sendMessage(player,ChatColor.RED +  "you do not have a island!");
             }
 
         }
@@ -242,18 +360,20 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             completions.add("create");
             completions.add("delete");
-            completions.add("level");
+            completions.add("upgrade");
             completions.add("teleport");
             completions.add("help");
             completions.add("visit");
             completions.add("trust");
             completions.add("untrust");
+            completions.add("block");
+            completions.add("unblock");
 
             return completions;
         }
 
         if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("level")) {
+            if (args[0].equalsIgnoreCase("upgrade")) {
                 completions.add("generator");
                 completions.add("border");
             }
@@ -274,6 +394,20 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
             }
 
             if (args[0].equalsIgnoreCase("untrust")) {
+                List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+                for (Player p : players) {
+                    completions.add(p.getName());
+                }
+            }
+
+            if (args[0].equalsIgnoreCase("block")) {
+                List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+                for (Player p : players) {
+                    completions.add(p.getName());
+                }
+            }
+
+            if (args[0].equalsIgnoreCase("unblock")) {
                 List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
                 for (Player p : players) {
                     completions.add(p.getName());

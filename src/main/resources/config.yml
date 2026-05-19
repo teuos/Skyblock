@@ -1,0 +1,52 @@
+island:
+
+  # What should the default world border size be?
+  default-border-size: 30
+
+  # By how much should the world border increase per level?
+  increase-border-amount: 20
+
+  # What level should players start at when making a new island?
+  # Recommend leaving this at 0.
+  default-border-level: 0
+  default-generator-level: 0
+
+  # Should the generators generate stone (true) or cobblestone (false)?
+  generate-stone: true
+
+  # At what levels should different ores start generating in island cobble generators? (set to -1 if you don't want the ore to generate ever)
+  generate-coal-level: 2
+  generate-copper-level: 5
+  generate-iron-level: 10
+  generate-gold-level: 15
+  generate-redstone-level: 20
+  generate-lapis-level: 25
+  generate-emerald-level: 30
+  generate-diamond-level: 35
+  generate-ancient-debris-level: 40
+
+
+  # How rare should it be for ores to generate at their given level? (0-100%, 100% will cause the ore to always generate (Not recommended cobble may become impossible to get!))
+  # Only touch this if you are sure you know what you are doing.
+  generate-coal-percentage: 60
+  generate-copper-percentage: 40
+  generate-iron-percentage: 25
+  generate-gold-percentage: 15
+  generate-redstone-percentage: 12
+  generate-lapis-percentage: 10
+  generate-emerald-percentage: 6
+  generate-diamond-percentage: 3
+  generate-ancient-debris-percentage: 1
+
+  # Do you want the generators to create deepslate? (set to -1 to disable)
+  generate-deepslate-level: 20
+  # How often do you want deepslate to generate in relation to cobblestone? (0-100%)
+  deepslate-generation-percentage: 30
+
+
+  # How long should the plugin wait (in seconds) before unloading inactive islands? set to -1 to disable
+  unload-delay: 600
+
+messages:
+  # What should the plugin messages be prefixed with?
+  prefix: "&6[Skyblock]"

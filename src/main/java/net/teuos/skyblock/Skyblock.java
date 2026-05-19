@@ -1,21 +1,20 @@
 package net.teuos.skyblock;
 
-import com.infernalsuite.asp.api.AdvancedSlimePaperAPI;
 import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.loaders.file.FileLoader;
 import com.sk89q.worldguard.WorldGuard;
 import net.teuos.skyblock.commands.IslandCommands;
 import net.teuos.skyblock.commands.SkyblockCommands;
-import net.teuos.skyblock.libs.CSVInteract;
-import net.teuos.skyblock.managers.CreateIslandManager;
+import net.teuos.skyblock.libs.MessageLibs;
+import net.teuos.skyblock.listeners.CobbleGen;
+import net.teuos.skyblock.listeners.TeleportListeners;
+import net.teuos.skyblock.managers.IslandDataManager;
+import net.teuos.skyblock.managers.IslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
 import net.teuos.skyblock.managers.IslandPermissionsManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.List;
 
 public final class Skyblock extends JavaPlugin {
 
@@ -24,13 +23,11 @@ public final class Skyblock extends JavaPlugin {
     private SlimeLoader worldLoader;
     private WorldGuard worldGuardApi;
 
-    private File islandLevelFile;
-
     @Override
     public void onEnable() {
         // Plugin startup logic
 
-
+        saveDefaultConfig();
 
         if (getServer().getPluginManager().getPlugin("WorldGuard") == null) {
             getLogger().severe("WorldGuard not found!");
@@ -53,45 +50,35 @@ public final class Skyblock extends JavaPlugin {
         worldGuardApi = WorldGuard.getInstance();
 
 
-        islandLevelFile = new File(getDataFolder(), "island_levels.csv");
+        IslandDataManager islandDataManager =
+                new IslandDataManager(this);
 
-        CSVInteract csvInteract = new CSVInteract(islandLevelFile);
+        MessageLibs messageLibs = new MessageLibs(this);
 
-        IslandPermissionsManager permissionsManager = new IslandPermissionsManager(worldLoader, worldGuardApi);
+        IslandPermissionsManager permissionsManager = new IslandPermissionsManager(worldLoader, worldGuardApi, this, islandDataManager);
 
-        IslandLevelManager levelManager = new IslandLevelManager(islandLevelFile, csvInteract);
+        IslandLevelManager levelManager = new IslandLevelManager(islandDataManager, this);
 
-        CreateIslandManager islandManager = new CreateIslandManager(islandLevelFile, worldLoader, worldGuardApi, permissionsManager, csvInteract, levelManager);
+        IslandManager islandManager = new IslandManager(worldLoader, worldGuardApi, permissionsManager, islandDataManager, levelManager, this);
 
+        islandManager.startIslandUnloadTask();
 
         System.out.println("Skyblock is enabled");
 
 
-        try {
-            if (!islandLevelFile.exists()) {
-                islandLevelFile.createNewFile();
-
-                Files.write(
-                        islandLevelFile.toPath(),
-                        List.of("world,cobblegen,border")
-                );
-
-                System.out.println("Created island_levels.csv");
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         // Register CobbleGen
-        getServer().getPluginManager().registerEvents(new CobbleGen(levelManager, csvInteract), this);
+        getServer().getPluginManager().registerEvents(new CobbleGen(levelManager, islandDataManager, this), this);
+
+        // Register IslandLeave
+        getServer().getPluginManager().registerEvents(new TeleportListeners(islandDataManager), this);
 
         // Register island commands
-        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, csvInteract);
+        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
 
         // Register skyblock commands
-        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager);
+        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager);
         getCommand("sb").setExecutor(skyblockCommands);
         getCommand("skyblock").setExecutor(skyblockCommands);
 
