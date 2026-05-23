@@ -1,5 +1,7 @@
 package net.teuos.skyblock.commands;
 
+import net.milkbowl.vault.economy.Economy;
+import net.teuos.skyblock.Skyblock;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.managers.IslandDataManager;
 import net.teuos.skyblock.managers.IslandManager;
@@ -26,14 +28,17 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
     private final IslandPermissionsManager islandPermissionsManager;
     private final IslandDataManager islandDataManager;
     private final MessageLibs messageLibs;
+    private final Economy econ;
+    private final Skyblock plugin;
 
-
-    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs) {
+    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, Economy econ, Skyblock plugin) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
         this.islandPermissionsManager = islandPermissionsManager;
         this.islandDataManager = islandDataManager;
         this.messageLibs = messageLibs;
+        this.econ = econ;
+        this.plugin = plugin;
     }
 
 
@@ -79,6 +84,12 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                 if (!player.hasPermission("skyblock.island.upgrade.generator") && !player.hasPermission("skyblock.admin")) {
                     messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
                     return true;
+                }
+
+                if (!)
+                ))) {
+                   messageLibs.sendMessage(player,ChatColor.RED + "You don't have enough money to upgrade your Skyblock border!");
+
                 }
 
                 try {

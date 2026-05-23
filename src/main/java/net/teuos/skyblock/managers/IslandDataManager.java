@@ -168,4 +168,18 @@ public class IslandDataManager {
                         .getKeys(false)
         );
     }
+
+    public double getUpgradePrice(String islandName, String type) {
+
+        if (plugin.getConfig().getDouble("prices.upgrade-" + type + "-scale") < 0) {
+            return plugin.getConfig().getDouble("prices.upgrade-" + type + "-price");
+        }
+
+        return plugin.getConfig().getDouble("prices.upgrade-" + type + "-price", 100) * Math.pow(
+                1 + plugin.getConfig().getDouble("prices.upgrade-" + type + "-scale", 0.5),
+                getBorderLevel(islandName)
+        );
+
+    }
+
 }

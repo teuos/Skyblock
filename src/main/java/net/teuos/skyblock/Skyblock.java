@@ -12,16 +12,30 @@ import net.teuos.skyblock.managers.IslandDataManager;
 import net.teuos.skyblock.managers.IslandManager;
 import net.teuos.skyblock.managers.IslandLevelManager;
 import net.teuos.skyblock.managers.IslandPermissionsManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
+
 
 import java.io.File;
 
 public final class Skyblock extends JavaPlugin {
 
 
+    private static Economy econ = null;
 
-    private SlimeLoader worldLoader;
-    private WorldGuard worldGuardApi;
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
+    }
 
     @Override
     public void onEnable() {
@@ -46,9 +60,14 @@ public final class Skyblock extends JavaPlugin {
             islandsFolder.mkdir();
         }
 
-        worldLoader = new FileLoader(islandsFolder);
-        worldGuardApi = WorldGuard.getInstance();
+        SlimeLoader worldLoader = new FileLoader(islandsFolder);
+        WorldGuard worldGuardApi = WorldGuard.getInstance();
 
+        if (!setupEconomy() ) {
+            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         IslandDataManager islandDataManager =
                 new IslandDataManager(this);
@@ -73,7 +92,7 @@ public final class Skyblock extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TeleportListeners(islandDataManager), this);
 
         // Register island commands
-        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs);
+        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, econ, this);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
 
