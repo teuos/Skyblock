@@ -1,5 +1,5 @@
 name: Skyblock
-version: '1.2.5'
+version: '1.2.7'
 main: net.teuos.skyblock.Skyblock
 api-version: '1.21'
 authors: [ teuos ]

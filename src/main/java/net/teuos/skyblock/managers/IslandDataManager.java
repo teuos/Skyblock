@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class IslandDataManager {
@@ -86,6 +87,17 @@ public class IslandDataManager {
                 0
         );
     }
+
+    public int getLevel(String islandName, String type) {
+        if (Objects.equals(type, "generator")) {
+            return getGenLevel(islandName);
+        } else if (Objects.equals(type, "border")) {
+            return getBorderLevel(islandName);
+        } else {
+            return 0;
+        }
+    }
+
 
     public long getLastActive(String islandName) {
 

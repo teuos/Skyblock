@@ -1,12 +1,10 @@
 package net.teuos.skyblock.commands;
 
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
 import net.teuos.skyblock.Skyblock;
 import net.teuos.skyblock.libs.MessageLibs;
-import net.teuos.skyblock.managers.IslandDataManager;
-import net.teuos.skyblock.managers.IslandManager;
-import net.teuos.skyblock.managers.IslandLevelManager;
-import net.teuos.skyblock.managers.IslandPermissionsManager;
+import net.teuos.skyblock.managers.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -17,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +27,19 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
     private final IslandPermissionsManager islandPermissionsManager;
     private final IslandDataManager islandDataManager;
     private final MessageLibs messageLibs;
-    private final Economy econ;
+    private final EcoManager ecoManager;
     private final Skyblock plugin;
+    private final File templatesFolder;
 
-    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, Economy econ, Skyblock plugin) {
+    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, EcoManager ecoManager, Skyblock plugin, File templatesFolder) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
         this.islandPermissionsManager = islandPermissionsManager;
         this.islandDataManager = islandDataManager;
         this.messageLibs = messageLibs;
-        this.econ = econ;
+        this.ecoManager = ecoManager;
         this.plugin = plugin;
+        this.templatesFolder = templatesFolder;
     }
 
 
@@ -86,15 +87,17 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                if (!)
-                ))) {
-                   messageLibs.sendMessage(player,ChatColor.RED + "You don't have enough money to upgrade your Skyblock border!");
+                EconomyResponse r = ecoManager.withdraw(player, ecoManager.getNextCost(player, "generator"));
 
+                if (r.type == EconomyResponse.ResponseType.FAILURE) {
+                    messageLibs.sendMessage(player, ChatColor.RED + "You don't have enough money to upgrade your generator!");
+                    messageLibs.sendMessage(player, ChatColor.RED + "You have: " + ChatColor.GOLD + ecoManager.getBalance(player) + ChatColor.RED + " You need: " + ChatColor.GOLD + ecoManager.getNextCost(player, "generator"));
+                    return true;
                 }
 
                 try {
                     int level = levelManager.increaseGenLevel(player.getUniqueId().toString());
-                    messageLibs.sendMessage(player,ChatColor.GREEN + "Your generator level is now " + level + "!");
+                    messageLibs.sendMessage(player,ChatColor.GREEN + "Your generator level is now " + level + "! and cost: Ƿ" + ChatColor.GOLD + "TO DO!");
                 } catch (IOException e){
                     messageLibs.sendMessage(player,ChatColor.RED + "Failed to upgrade level. If you believe this to be a mistake please report the issue!");
                     e.printStackTrace();
@@ -106,6 +109,14 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
                 if (!player.hasPermission("skyblock.island.upgrade.border") && !player.hasPermission("skyblock.admin")) {
                     messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                    return true;
+                }
+
+                EconomyResponse r = ecoManager.withdraw(player, ecoManager.getNextCost(player, "border"));
+
+                if (r.type == EconomyResponse.ResponseType.FAILURE) {
+                    messageLibs.sendMessage(player, ChatColor.RED + "You don't have enough money to upgrade your border!");
+                    messageLibs.sendMessage(player, ChatColor.RED + "You have: " + ChatColor.GOLD + ecoManager.getBalance(player) + ChatColor.RED + " You need: " + ChatColor.GOLD + ecoManager.getNextCost(player, "border"));
                     return true;
                 }
 
@@ -134,7 +145,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            if (islandManager.createIsland(player.getPlayer().getUniqueId().toString())) {
+            if (islandManager.createIsland(player.getPlayer().getUniqueId().toString(), args[1])) {
                 World target = Bukkit.getWorld(player.getUniqueId().toString());
                 player.teleport(target.getSpawnLocation());
                 messageLibs.sendMessage(player,ChatColor.GREEN + "Island has been created!");
@@ -384,6 +395,19 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 2) {
+
+            if (args[0].equalsIgnoreCase("create")) {
+
+                File[] files = templatesFolder.listFiles();
+
+                if (files != null) {
+                    for (File file : files) {
+                        completions.add(file.getName().replace(".slime", ""));
+                    }
+                }
+
+            }
+
             if (args[0].equalsIgnoreCase("upgrade")) {
                 completions.add("generator");
                 completions.add("border");

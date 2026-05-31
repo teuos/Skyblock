@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +28,16 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
     private final Skyblock plugin;
     private final MessageLibs messageLibs;
     private final IslandDataManager islandDataManager;
+    private final File templatesFolder;
 
-    public SkyblockCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, Skyblock plugin, MessageLibs messageLibs, IslandDataManager islandDataManager) {
+    public SkyblockCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, Skyblock plugin, MessageLibs messageLibs, IslandDataManager islandDataManager, File templatesFolder) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
         this.islandPermissionsManager = islandPermissionsManager;
         this.plugin = plugin;
         this.messageLibs = messageLibs;
         this.islandDataManager = islandDataManager;
+        this.templatesFolder = templatesFolder;
     }
 
 
@@ -62,7 +65,7 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                islandManager.createTemplate(player);
+                islandManager.createTemplate(player, args[2]);
             }
 
             if (args[1].equalsIgnoreCase("teleport")){
@@ -73,13 +76,13 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                 }
 
                 try {
-                    if (islandManager.loadIsland("skyblock_template")) {
-                        World target = Bukkit.getWorld("skyblock_template");
+                    if (islandManager.loadTemplate(args[2])) {
+                        World target = Bukkit.getWorld(args[2]);
                         player.teleport(target.getSpawnLocation());
-                        messageLibs.sendMessage(player, ChatColor.GREEN + "Teleported to skyblock_template!");
+                        messageLibs.sendMessage(player, ChatColor.GREEN + "Teleported to " + args[2] + "!");
                     }
                 } catch (IOException e) {
-                    messageLibs.sendMessage(player, ChatColor.RED + "Failed to teleport skyblock_template!");
+                    messageLibs.sendMessage(player, ChatColor.RED + "Failed to teleport to " + args[2] + "!");
                     throw new RuntimeException(e);
                 }
             }
@@ -155,6 +158,29 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
 
             return completions;
         }
+
+        if (args.length == 3) {
+            if (args[1].equalsIgnoreCase("teleport")) {
+                File[] files = templatesFolder.listFiles();
+
+                if (files != null) {
+                    for (File file : files) {
+                        completions.add(file.getName().replace(".slime", ""));
+                    }
+                }
+            }
+
+            if (args[1].equalsIgnoreCase("delete")) {
+                File[] files = templatesFolder.listFiles();
+
+                if (files != null) {
+                    for (File file : files) {
+                        completions.add(file.getName().replace(".slime", ""));
+                    }
+                }
+            }
+        }
+
 
         return completions;
     }

@@ -12,6 +12,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import net.teuos.skyblock.Skyblock;
@@ -74,9 +75,49 @@ public class IslandPermissionsManager {
         DefaultDomain owner = global.getOwners();
         owner.addPlayer(UUID.fromString(uuid));
 
-
+        try {
+            regions.save();
+        } catch (StorageException e) {
+            e.printStackTrace();
+        }
 
     }
+
+
+    public void applyTemplateFlags(World world){
+
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regions = container.get(BukkitAdapter.adapt(world));
+
+        if (regions == null) {
+            return;
+        }
+
+        GlobalProtectedRegion global = (GlobalProtectedRegion) regions.getRegion("__global__");
+
+        if (global == null) {
+            global = new GlobalProtectedRegion("__global__");
+            regions.addRegion(global);
+        }
+
+        global.setFlag(Flags.BLOCK_BREAK, StateFlag.State.DENY);
+        global.setFlag(Flags.BLOCK_PLACE, StateFlag.State.DENY);
+        global.setFlag(Flags.INTERACT, StateFlag.State.DENY);
+        global.setFlag(Flags.USE, StateFlag.State.DENY);
+        global.setFlag(Flags.CHEST_ACCESS, StateFlag.State.DENY);
+        global.setFlag(Flags.PVP, StateFlag.State.DENY);
+        global.setFlag(Flags.TNT, StateFlag.State.DENY);
+        global.setFlag(Flags.CREEPER_EXPLOSION, StateFlag.State.DENY);
+        global.setFlag(Flags.MOB_SPAWNING, StateFlag.State.DENY);
+
+        try {
+            regions.save();
+        } catch (StorageException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     public boolean addMember(Player player, World world){
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -89,6 +130,12 @@ public class IslandPermissionsManager {
         GlobalProtectedRegion global = (GlobalProtectedRegion) regions.getRegion("__global__");
 
         global.getMembers().addPlayer(player.getUniqueId());
+
+        try {
+            regions.save();
+        } catch (StorageException e) {
+            e.printStackTrace();
+        }
 
         return global.getMembers().contains(player.getUniqueId());
     }
@@ -104,6 +151,12 @@ public class IslandPermissionsManager {
         GlobalProtectedRegion global = (GlobalProtectedRegion) regions.getRegion("__global__");
 
         global.getMembers().removePlayer(player.getUniqueId());
+
+        try {
+            regions.save();
+        } catch (StorageException e) {
+            e.printStackTrace();
+        }
 
         return !global.getMembers().contains(player.getUniqueId());
     }

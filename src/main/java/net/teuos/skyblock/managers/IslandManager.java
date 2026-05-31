@@ -21,24 +21,26 @@ import java.util.List;
 public class IslandManager {
 
     private final SlimeLoader loader;
-    private final AdvancedSlimePaperAPI api;
+    private final SlimeLoader templateLoader;
+    private final AdvancedSlimePaperAPI slimeApi;
     private final WorldGuard worldGuard;
     private final IslandPermissionsManager permissionsManager;
     private final IslandDataManager islandDataManager;
     private final IslandLevelManager islandLevelManager;
     private final Skyblock plugin;
 
-    public IslandManager(SlimeLoader loader, WorldGuard worldGuard, IslandPermissionsManager permissionsManager, IslandDataManager islandDataManager, IslandLevelManager islandLevelManager, Skyblock plugin) {
+    public IslandManager(SlimeLoader loader, SlimeLoader templateLoader, WorldGuard worldGuard, IslandPermissionsManager permissionsManager, IslandDataManager islandDataManager, IslandLevelManager islandLevelManager, Skyblock plugin) {
         this.loader = loader;
+        this.templateLoader = templateLoader;
         this.worldGuard = worldGuard;
-        this.api = AdvancedSlimePaperAPI.instance();
+        this.slimeApi = AdvancedSlimePaperAPI.instance();
         this.permissionsManager = permissionsManager;
         this.islandDataManager = islandDataManager;
         this.islandLevelManager = islandLevelManager;
         this.plugin = plugin;
     }
 
-    public boolean createIsland(String islandName) {
+    public boolean createIsland(String islandName, String templateName) {
 
         try {
 
@@ -48,22 +50,20 @@ public class IslandManager {
             props.setValue(SlimeProperties.SPAWN_Y, 60);
             props.setValue(SlimeProperties.SPAWN_Z, 0);
 
-            SlimeWorld template = api.readWorld(
-                    loader,
-                    "skyblock_template",
+            SlimeWorld template = slimeApi.readWorld(
+                    templateLoader,
+                    templateName,
                     false,
                     props
             );
 
             SlimeWorld island = template.clone(islandName, loader);
 
-            api.saveWorld(island);
+            slimeApi.saveWorld(island);
 
             loadIsland(islandName);
 
             World world = Bukkit.getWorld(islandName);
-
-            long now = System.currentTimeMillis();
 
             islandDataManager.createRecord(islandName);
 
@@ -88,7 +88,7 @@ public class IslandManager {
 
             if (world != null) {
                 for (Player player : world.getPlayers()) {
-                    player.teleport(Bukkit.getWorld("world").getSpawnLocation());
+                    player.teleport(Bukkit.getWorld(plugin.getConfig().getString("spawn.spawn-world-name", "world")).getSpawnLocation());
                 }
 
                 try {
@@ -108,7 +108,21 @@ public class IslandManager {
         }
     }
 
-    public void createTemplate(org.bukkit.entity.Player player){
+    public boolean islandExists(String islandName) {
+        try {
+            return loader.worldExists(islandName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void createTemplate(org.bukkit.entity.Player player, String templateName){
+
+        if (islandExists(templateName)) {
+            player.sendMessage(ChatColor.RED + "An island named " + templateName + " already exists!");
+        }
+
         try {
 
             SlimePropertyMap props = new SlimePropertyMap();
@@ -117,16 +131,18 @@ public class IslandManager {
             props.setValue(SlimeProperties.SPAWN_Y, 60);
             props.setValue(SlimeProperties.SPAWN_Z, 0);
 
-            SlimeWorld template = api.createEmptyWorld(
-                    "skyblock_template",
+            SlimeWorld template = slimeApi.createEmptyWorld(
+                    templateName,
                     false,
                     props,
-                    loader
+                    templateLoader
             );
 
-            api.saveWorld(template);
+            slimeApi.saveWorld(template);
 
-            api.loadWorld(template, true);
+            loadTemplate(templateName);
+
+            permissionsManager.applyTemplateFlags(Bukkit.getWorld(templateName));
 
             player.sendMessage(ChatColor.GREEN + "Created Island Template");
 
@@ -230,9 +246,25 @@ public class IslandManager {
     public boolean loadIsland(String worldName)throws IOException {
         try {
             if (Bukkit.getWorld(worldName) == null) {
-                SlimeWorld slimeWorld = api.readWorld(loader, worldName, false, new SlimePropertyMap());
-                api.loadWorld(slimeWorld, true);
+                SlimeWorld slimeWorld = slimeApi.readWorld(loader, worldName, false, new SlimePropertyMap());
+                slimeApi.loadWorld(slimeWorld, true);
                 updateWorldBorder(worldName);
+            }
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    public boolean loadTemplate(String worldName) throws IOException {
+        try {
+            if (Bukkit.getWorld(worldName) == null) {
+                SlimeWorld slimeWorld = slimeApi.readWorld(templateLoader, worldName, false, new SlimePropertyMap());
+                slimeApi.loadWorld(slimeWorld, true);
+                World world = Bukkit.getWorld(worldName);
+                world.getWorldBorder().setSize(plugin.getConfig().getInt("island.default-border-size", 30));
             }
             return true;
         } catch (Exception e){

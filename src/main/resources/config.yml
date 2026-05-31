@@ -1,3 +1,7 @@
+spawn:
+  # what is the main spawn worlds name?
+  spawn-world-name: world #default is world.
+  
 island:
 
   # What should the default world border size be?

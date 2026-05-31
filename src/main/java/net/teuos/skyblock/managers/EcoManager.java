@@ -9,13 +9,13 @@ public class EcoManager {
 
     private final Skyblock plugin;
     private final Economy economy;
+    private final IslandDataManager islandDataManager;
 
-    private EcoManager(Skyblock plugin, Economy economy) {
+    public EcoManager(Skyblock plugin, Economy economy, IslandDataManager islandDataManager) {
         this.plugin = plugin;
         this.economy = economy;
+        this.islandDataManager = islandDataManager;
     }
-
-
 
     public double getBalance(Player player){
         return economy.getBalance(player);
@@ -33,4 +33,21 @@ public class EcoManager {
         return economy.depositPlayer(player, amount);
     }
 
+    public double getNextCost(Player player, String type){
+
+        double basePrice = plugin.getConfig().getDouble("upgrade-" + type + "-price");
+        double scale = plugin.getConfig().getDouble("upgrade-" + type + "-scale");
+
+        int level = islandDataManager.getLevel(
+                player.getUniqueId().toString(),
+                type
+        );
+
+        if (scale < 0){
+            return basePrice * level;
+        }
+
+        return basePrice * Math.pow(1 + scale, level);
+        
+    }
 }

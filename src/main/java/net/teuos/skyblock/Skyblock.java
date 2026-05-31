@@ -8,10 +8,7 @@ import net.teuos.skyblock.commands.SkyblockCommands;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.listeners.CobbleGen;
 import net.teuos.skyblock.listeners.TeleportListeners;
-import net.teuos.skyblock.managers.IslandDataManager;
-import net.teuos.skyblock.managers.IslandManager;
-import net.teuos.skyblock.managers.IslandLevelManager;
-import net.teuos.skyblock.managers.IslandPermissionsManager;
+import net.teuos.skyblock.managers.*;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import net.milkbowl.vault.economy.Economy;
@@ -23,7 +20,7 @@ import java.io.File;
 public final class Skyblock extends JavaPlugin {
 
 
-    private static Economy econ = null;
+    private static Economy economy = null;
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
@@ -33,8 +30,8 @@ public final class Skyblock extends JavaPlugin {
         if (rsp == null) {
             return false;
         }
-        econ = rsp.getProvider();
-        return econ != null;
+        economy = rsp.getProvider();
+        return economy != null;
     }
 
     @Override
@@ -51,7 +48,6 @@ public final class Skyblock extends JavaPlugin {
 
         File islandsFolder = new File(getDataFolder(), "islands");
 
-
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
         }
@@ -60,7 +56,15 @@ public final class Skyblock extends JavaPlugin {
             islandsFolder.mkdir();
         }
 
+        File templatesFolder = new File(getDataFolder(), "templates");
+
+        if(!templatesFolder.exists()){
+            templatesFolder.mkdir();
+        }
+
+
         SlimeLoader worldLoader = new FileLoader(islandsFolder);
+        SlimeLoader templateLoader = new FileLoader(templatesFolder);
         WorldGuard worldGuardApi = WorldGuard.getInstance();
 
         if (!setupEconomy() ) {
@@ -68,6 +72,8 @@ public final class Skyblock extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+
 
         IslandDataManager islandDataManager =
                 new IslandDataManager(this);
@@ -78,7 +84,10 @@ public final class Skyblock extends JavaPlugin {
 
         IslandLevelManager levelManager = new IslandLevelManager(islandDataManager, this);
 
-        IslandManager islandManager = new IslandManager(worldLoader, worldGuardApi, permissionsManager, islandDataManager, levelManager, this);
+        IslandManager islandManager = new IslandManager(worldLoader, templateLoader ,worldGuardApi, permissionsManager, islandDataManager, levelManager, this);
+
+        EcoManager ecoManager = new EcoManager(this, economy, islandDataManager);
+
 
         islandManager.startIslandUnloadTask();
 
@@ -92,12 +101,12 @@ public final class Skyblock extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TeleportListeners(islandDataManager), this);
 
         // Register island commands
-        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, econ, this);
+        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
 
         // Register skyblock commands
-        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager);
+        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager, templatesFolder);
         getCommand("sb").setExecutor(skyblockCommands);
         getCommand("skyblock").setExecutor(skyblockCommands);
 
