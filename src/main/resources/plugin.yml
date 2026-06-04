@@ -70,7 +70,7 @@ permissions:
     description: Allows reloading the plugin
     default: op
 
-  skyblock.teleport:
+  skyblock.others.teleport:
     description: Allows user to teleport to other islands regardless of blocked status
     default: op
 
@@ -84,6 +84,10 @@ permissions:
 
   skyblock.template.teleport:
     description: Allows teleportation to the template island
+    default: op
+
+  skyblock.others.setUpgradeLevel:
+    description: Allows the player to set the level of others upgrade levels
     default: op
 
   skyblock.admin:

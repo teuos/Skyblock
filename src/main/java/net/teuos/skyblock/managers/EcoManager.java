@@ -35,8 +35,8 @@ public class EcoManager {
 
     public double getNextCost(Player player, String type){
 
-        double basePrice = plugin.getConfig().getDouble("upgrade-" + type + "-price");
-        double scale = plugin.getConfig().getDouble("upgrade-" + type + "-scale");
+        double basePrice = plugin.getConfig().getDouble("prices.upgrade-" + type + "-price");
+        double scale = plugin.getConfig().getDouble("prices.upgrade-" + type + "-scale");
 
         int level = islandDataManager.getLevel(
                 player.getUniqueId().toString(),
@@ -47,7 +47,7 @@ public class EcoManager {
             return basePrice * level;
         }
 
-        return basePrice * Math.pow(1 + scale, level);
+        return Math.floor(basePrice * Math.pow(1 + scale, level));
         
     }
 }

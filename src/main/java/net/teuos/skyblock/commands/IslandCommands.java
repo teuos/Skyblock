@@ -73,7 +73,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         }
 
 
-        if (args[0].equalsIgnoreCase("upgrade")){
+        else if (args[0].equalsIgnoreCase("upgrade")){
 
             if (!player.hasPermission("skyblock.island.upgrade") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
@@ -87,7 +87,9 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                EconomyResponse r = ecoManager.withdraw(player, ecoManager.getNextCost(player, "generator"));
+                double cost = ecoManager.getNextCost(player, "generator");
+
+                EconomyResponse r = ecoManager.withdraw(player, cost);
 
                 if (r.type == EconomyResponse.ResponseType.FAILURE) {
                     messageLibs.sendMessage(player, ChatColor.RED + "You don't have enough money to upgrade your generator!");
@@ -97,7 +99,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
                 try {
                     int level = levelManager.increaseGenLevel(player.getUniqueId().toString());
-                    messageLibs.sendMessage(player,ChatColor.GREEN + "Your generator level is now " + level + "! and cost: Ƿ" + ChatColor.GOLD + "TO DO!");
+                    messageLibs.sendMessage(player,ChatColor.GREEN + "Your generator level is now " + level + "! and cost: Ƿ" + cost);
                 } catch (IOException e){
                     messageLibs.sendMessage(player,ChatColor.RED + "Failed to upgrade level. If you believe this to be a mistake please report the issue!");
                     e.printStackTrace();
@@ -105,7 +107,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
             }
 
-            if (args[1].equalsIgnoreCase("border")){
+            else if (args[1].equalsIgnoreCase("border")){
 
                 if (!player.hasPermission("skyblock.island.upgrade.border") && !player.hasPermission("skyblock.admin")) {
                     messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
@@ -131,12 +133,22 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                 }
             }
 
+            else {
+                messageLibs.sendMessage(player, ChatColor.RED + "Command does not exist!");
+            }
+
         }
 
-        if (args[0].equalsIgnoreCase("create")) {
+        else if (args[0].equalsIgnoreCase("create")) {
 
             if (!player.hasPermission("skyblock.island.create") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
+
+            if (args.length < 2) {
+                messageLibs.sendMessage(player, ChatColor.RED + "Please select an island type!");
+                messageLibs.sendMessage(player, ChatColor.GOLD + "Example usage: island create <islandType>");
                 return true;
             }
 
@@ -156,7 +168,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
         }
 
-        if (args[0].equalsIgnoreCase("delete")) {
+        else if (args[0].equalsIgnoreCase("delete")) {
 
             if (!player.hasPermission("skyblock.island.delete") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
@@ -177,7 +189,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
             }
         }
 
-        if (args[0].equalsIgnoreCase("teleport")) {
+        else if (args[0].equalsIgnoreCase("teleport")) {
 
             if (!player.hasPermission("skyblock.island.teleport") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
@@ -200,7 +212,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
             }
         }
 
-        if (args[0].equalsIgnoreCase("visit")) {
+        else if (args[0].equalsIgnoreCase("visit")) {
 
             if (!player.hasPermission("skyblock.island.visit") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
@@ -256,7 +268,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
         }
 
-        if (args[0].equalsIgnoreCase("trust")) {
+        else if (args[0].equalsIgnoreCase("trust")) {
 
             if (!player.hasPermission("skyblock.island.trust") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
@@ -289,7 +301,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
             }
         }
 
-        if (args[0].equalsIgnoreCase("untrust")) {
+        else if (args[0].equalsIgnoreCase("untrust")) {
 
             if (!player.hasPermission("skyblock.island.untrust") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
@@ -321,7 +333,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
         }
 
-        if (args[0].equalsIgnoreCase("block")) {
+        else if (args[0].equalsIgnoreCase("block")) {
             if (!player.hasPermission("skyblock.island.block") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
                 return true;
@@ -346,7 +358,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
             }
         }
 
-        if (args[0].equalsIgnoreCase("unblock")) {
+        else if (args[0].equalsIgnoreCase("unblock")) {
             if (!player.hasPermission("skyblock.island.unblock") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
                 return true;
@@ -368,6 +380,10 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                 messageLibs.sendMessage(player,ChatColor.RED +  "you do not have a island!");
             }
 
+        }
+
+        else {
+            messageLibs.sendMessage(player,ChatColor.RED +  "Command does not exist!");
         }
 
         return true;

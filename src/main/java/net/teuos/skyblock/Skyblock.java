@@ -80,11 +80,11 @@ public final class Skyblock extends JavaPlugin {
 
         MessageLibs messageLibs = new MessageLibs(this);
 
-        IslandPermissionsManager permissionsManager = new IslandPermissionsManager(worldLoader, worldGuardApi, this, islandDataManager);
+        IslandPermissionsManager permissionsManager = new IslandPermissionsManager(islandDataManager, this);
 
         IslandLevelManager levelManager = new IslandLevelManager(islandDataManager, this);
 
-        IslandManager islandManager = new IslandManager(worldLoader, templateLoader ,worldGuardApi, permissionsManager, islandDataManager, levelManager, this);
+        IslandManager islandManager = new IslandManager(worldLoader, templateLoader, permissionsManager, islandDataManager, levelManager, this);
 
         EcoManager ecoManager = new EcoManager(this, economy, islandDataManager);
 

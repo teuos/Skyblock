@@ -1,16 +1,11 @@
 package net.teuos.skyblock.managers;
 
-import com.infernalsuite.asp.api.AdvancedSlimePaperAPI;
-import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
@@ -18,24 +13,20 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import net.teuos.skyblock.Skyblock;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Slime;
+
 
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class IslandPermissionsManager {
 
-    private final SlimeLoader loader;
-    private final WorldGuard worldGuard;
-    private final AdvancedSlimePaperAPI api;
-    private final Skyblock plugin;
-    private final IslandDataManager islandDataManager;
 
-    public IslandPermissionsManager(SlimeLoader loader, WorldGuard worldGuard, Skyblock plugin, IslandDataManager islandDataManager) {
-        this.loader = loader;
-        this.worldGuard = worldGuard;
-        this.api = AdvancedSlimePaperAPI.instance();
-        this.plugin = plugin;
+    private final IslandDataManager islandDataManager;
+    private final Skyblock plugin;
+
+    public IslandPermissionsManager(IslandDataManager islandDataManager, Skyblock plugin) {
         this.islandDataManager = islandDataManager;
+        this.plugin = plugin;
     }
 
 
@@ -78,7 +69,7 @@ public class IslandPermissionsManager {
         try {
             regions.save();
         } catch (StorageException e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to save region", e);
         }
 
     }
@@ -113,7 +104,7 @@ public class IslandPermissionsManager {
         try {
             regions.save();
         } catch (StorageException e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to save region", e);
         }
 
     }
@@ -134,7 +125,7 @@ public class IslandPermissionsManager {
         try {
             regions.save();
         } catch (StorageException e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to save region", e);
         }
 
         return global.getMembers().contains(player.getUniqueId());
@@ -155,7 +146,7 @@ public class IslandPermissionsManager {
         try {
             regions.save();
         } catch (StorageException e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to save region", e);
         }
 
         return !global.getMembers().contains(player.getUniqueId());

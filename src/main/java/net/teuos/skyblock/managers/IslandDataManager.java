@@ -1,7 +1,6 @@
 package net.teuos.skyblock.managers;
 
 import net.teuos.skyblock.Skyblock;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -11,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.logging.Level;
 
 public class IslandDataManager {
 
@@ -28,7 +27,7 @@ public class IslandDataManager {
             try {
                 islandsFile.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                plugin.getLogger().log(Level.SEVERE, "Failed to create islands.yml", e);
             }
         }
 
@@ -44,7 +43,7 @@ public class IslandDataManager {
         try {
             islandsConfig.save(islandsFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to save islands.yml", e);
         }
     }
 
@@ -152,6 +151,15 @@ public class IslandDataManager {
 
         islandsConfig.set(
                 "islands." + islandName + ".levels.generator-level",
+                level
+        );
+
+        save();
+    }
+
+    public void setUpgradeLevel(String islandName, String type, int level) {
+        islandsConfig.set(
+                "islands." + islandName + ".levels." + type + "-level",
                 level
         );
 

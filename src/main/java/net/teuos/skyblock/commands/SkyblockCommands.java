@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class SkyblockCommands implements CommandExecutor, TabCompleter {
 
@@ -65,10 +66,35 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
+                if (args.length < 3) {
+                    messageLibs.sendMessage(player, ChatColor.RED + "Please supply a name for the template!");
+                    messageLibs.sendMessage(player, ChatColor.GOLD + "Example usage: skyblock template create templateNameHere");
+                    return true;
+                }
+
                 islandManager.createTemplate(player, args[2]);
             }
 
-            if (args[1].equalsIgnoreCase("teleport")){
+            else if (args[1].equalsIgnoreCase("delete")){
+                if (!player.hasPermission("skyblock.template.delete") && !player.hasPermission("skyblock.admin")) {
+                    messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                    return true;
+                }
+
+                switch (islandManager.deleteTemplate(args[2])) {
+                    case (0):
+                        messageLibs.sendMessage(player, ChatColor.GREEN + "Template deleted!");
+                        break;
+                    case (1):
+                        messageLibs.sendMessage(player, ChatColor.RED + "Template does not exist!");
+                        break;
+                    case (2):
+                        messageLibs.sendMessage(player, ChatColor.RED + "Failed to delete template!");
+                }
+            }
+
+
+            else if (args[1].equalsIgnoreCase("teleport")){
 
                 if (!player.hasPermission("skyblock.template.teleport") && !player.hasPermission("skyblock.admin")) {
                     messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
@@ -87,10 +113,12 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                 }
             }
 
-        }
+            else {
+                messageLibs.sendMessage(player, ChatColor.RED + "Unknown command!");
+            }
 
-        if (args[0].equalsIgnoreCase("teleport")){
-            if (!player.hasPermission("skyblock.teleport") && !player.hasPermission("skyblock.admin")) {
+        } else if (args[0].equalsIgnoreCase("teleport")){
+            if (!player.hasPermission("skyblock.others.teleport") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
                 return true;
             }
@@ -110,10 +138,39 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                 }
             }
 
+        } else if (args[0].equalsIgnoreCase("setUpgradeLevel")){
 
-        }
+            if (!player.hasPermission("skyblock.others.setUpgradeLevel") && !player.hasPermission("skyblock.admin")) {
+                messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                return true;
+            }
 
-        if (args[0].equalsIgnoreCase("reload")) {
+            if (args.length < 4) {
+                player.sendMessage(ChatColor.YELLOW + "Usage: /skyblock setUpgradeLevel <player> <type> <level>");
+            }
+
+            Player target = Bukkit.getPlayer(args[1]);
+            String targetUUID = target.getUniqueId().toString();
+
+
+            islandDataManager.setUpgradeLevel(targetUUID, args[2].toLowerCase(), Integer.parseInt(args[3]));
+
+            if (args[2].equalsIgnoreCase("border")) {
+                try {
+                    islandManager.updateWorldBorder(targetUUID);
+                } catch (IOException e) {
+                    plugin.getLogger().log(Level.SEVERE, "Failed to update world border", e);
+                    throw new RuntimeException(e);
+                }
+            }
+
+            if (islandDataManager.getLevel(targetUUID, args[2].toLowerCase()) == Integer.parseInt(args[3])) {
+                messageLibs.sendMessage(player, ChatColor.GREEN + args[1] + "'s "  + args[2] + " level is now " + args[3] + "!");
+            } else {
+                messageLibs.sendMessage(player, ChatColor.RED + "Failed to set " + args[1] + "'s "  + args[2] + " level to " + args[3] + "!");
+            }
+
+        } else if (args[0].equalsIgnoreCase("reload")) {
 
             if (!player.hasPermission("skyblock.reload") && !player.hasPermission("skyblock.admin")) {
                 messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
@@ -124,6 +181,8 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
 
             messageLibs.sendMessage(player, ChatColor.GREEN + "Config reloaded!");
 
+        } else {
+            messageLibs.sendMessage(player, ChatColor.RED + "Unknown command!");
         }
 
         return true;
@@ -146,6 +205,8 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             if (sender.hasPermission("skyblock.command.template.*")) {completions.add("template");}
             if (sender.hasPermission("skyblock.command.reload")) {completions.add("reload");}
+            if (sender.hasPermission("skyblock.others.setUpgradeLevel")) {completions.add("setUpgradeLevel");}
+            if (sender.hasPermission("skyblock.others.teleport")) {completions.add("teleport");}
             return completions;
         }
 
@@ -156,28 +217,43 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                 completions.add("teleport");
             }
 
+            if (args[0].equalsIgnoreCase("setUpgradeLevel")) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    completions.add(player.getName());
+                }
+            }
             return completions;
         }
 
         if (args.length == 3) {
-            if (args[1].equalsIgnoreCase("teleport")) {
-                File[] files = templatesFolder.listFiles();
 
-                if (files != null) {
-                    for (File file : files) {
-                        completions.add(file.getName().replace(".slime", ""));
+
+            if (args[0].equalsIgnoreCase("template")) {
+
+                if (args[1].equalsIgnoreCase("teleport")) {
+                    File[] files = templatesFolder.listFiles();
+
+                    if (files != null) {
+                        for (File file : files) {
+                            completions.add(file.getName().replace(".slime", ""));
+                        }
+                    }
+                }
+
+                if (args[1].equalsIgnoreCase("delete")) {
+                    File[] files = templatesFolder.listFiles();
+
+                    if (files != null) {
+                        for (File file : files) {
+                            completions.add(file.getName().replace(".slime", ""));
+                        }
                     }
                 }
             }
 
-            if (args[1].equalsIgnoreCase("delete")) {
-                File[] files = templatesFolder.listFiles();
-
-                if (files != null) {
-                    for (File file : files) {
-                        completions.add(file.getName().replace(".slime", ""));
-                    }
-                }
+            if (args[0].equalsIgnoreCase("setUpgradeLevel")) {
+                completions.add("generator");
+                completions.add("border");
             }
         }
 

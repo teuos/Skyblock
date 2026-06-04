@@ -4,10 +4,8 @@ package net.teuos.skyblock.managers;
 import com.infernalsuite.asp.api.AdvancedSlimePaperAPI;
 import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.api.world.SlimeWorld;
-import com.infernalsuite.asp.api.world.SlimeWorldInstance;
 import com.infernalsuite.asp.api.world.properties.SlimeProperties;
 import com.infernalsuite.asp.api.world.properties.SlimePropertyMap;
-import com.sk89q.worldguard.WorldGuard;
 import net.teuos.skyblock.Skyblock;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,23 +14,21 @@ import org.bukkit.entity.Player;
 
 
 import java.io.IOException;
-import java.util.List;
+import java.util.logging.Level;
 
 public class IslandManager {
 
     private final SlimeLoader loader;
     private final SlimeLoader templateLoader;
     private final AdvancedSlimePaperAPI slimeApi;
-    private final WorldGuard worldGuard;
     private final IslandPermissionsManager permissionsManager;
     private final IslandDataManager islandDataManager;
     private final IslandLevelManager islandLevelManager;
     private final Skyblock plugin;
 
-    public IslandManager(SlimeLoader loader, SlimeLoader templateLoader, WorldGuard worldGuard, IslandPermissionsManager permissionsManager, IslandDataManager islandDataManager, IslandLevelManager islandLevelManager, Skyblock plugin) {
+    public IslandManager(SlimeLoader loader, SlimeLoader templateLoader, IslandPermissionsManager permissionsManager, IslandDataManager islandDataManager, IslandLevelManager islandLevelManager, Skyblock plugin) {
         this.loader = loader;
         this.templateLoader = templateLoader;
-        this.worldGuard = worldGuard;
         this.slimeApi = AdvancedSlimePaperAPI.instance();
         this.permissionsManager = permissionsManager;
         this.islandDataManager = islandDataManager;
@@ -73,7 +69,7 @@ public class IslandManager {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to create island " + islandName, e);
             return false;
         }
 
@@ -94,6 +90,7 @@ public class IslandManager {
                 try {
                     Bukkit.unloadWorld(islandName, false);
                 } catch (Exception ignored) {
+                    plugin.getLogger().log(Level.WARNING, "Failed to unload island " + islandName);
                 }
             }
 
@@ -103,7 +100,7 @@ public class IslandManager {
 
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to delete island " + islandName, e);
             return false;
         }
     }
@@ -112,15 +109,27 @@ public class IslandManager {
         try {
             return loader.worldExists(islandName);
         } catch (Exception e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to check island " + islandName, e);
             return false;
         }
     }
+
+
+    public boolean templateExists(String templateName) {
+        try {
+            return templateLoader.worldExists(templateName);
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to check template " + templateName, e);
+            return false;
+        }
+    }
+
 
     public void createTemplate(org.bukkit.entity.Player player, String templateName){
 
         if (islandExists(templateName)) {
             player.sendMessage(ChatColor.RED + "An island named " + templateName + " already exists!");
+            return;
         }
 
         try {
@@ -149,10 +158,39 @@ public class IslandManager {
         }
         catch (Exception e) {
             player.sendMessage(ChatColor.RED + "Failed to create template.");
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to create template", e);
         }
     }
 
+    public int deleteTemplate(String templateName) {
+
+        if (!templateExists(templateName)) {
+            return 1;
+        }
+
+        try {
+            World world = Bukkit.getWorld(templateName);
+
+            if (world != null) {
+                for (Player player : world.getPlayers()) {
+                    player.teleport(Bukkit.getWorld(plugin.getConfig().getString("spawn.spawn-world-name", "world")).getSpawnLocation());
+                }
+
+                if (!Bukkit.unloadWorld(world, false)) {
+                    return 2;
+                }
+            }
+
+            templateLoader.deleteWorld(templateName);
+            return 0;
+
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to delete template", e);
+            return 2;
+        }
+
+
+    }
 
     public void updateWorldBorder(String worldName) throws IOException {
 
@@ -162,7 +200,7 @@ public class IslandManager {
                 world.getWorldBorder().setSize(islandLevelManager.getBorderSize(worldName));
             }
         } catch (Exception e){
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to update world border", e);
         }
 
     }
@@ -252,7 +290,7 @@ public class IslandManager {
             }
             return true;
         } catch (Exception e){
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to load island " + worldName, e);
             return false;
         }
 
@@ -268,7 +306,7 @@ public class IslandManager {
             }
             return true;
         } catch (Exception e){
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to load template " + worldName, e);
             return false;
         }
 
