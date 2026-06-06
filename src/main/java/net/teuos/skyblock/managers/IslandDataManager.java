@@ -1,7 +1,6 @@
 package net.teuos.skyblock.managers;
 
 import net.teuos.skyblock.Skyblock;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -10,7 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Objects;
+import java.util.logging.Level;
 
 public class IslandDataManager {
 
@@ -27,7 +27,7 @@ public class IslandDataManager {
             try {
                 islandsFile.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                plugin.getLogger().log(Level.SEVERE, "Failed to create islands.yml", e);
             }
         }
 
@@ -43,7 +43,7 @@ public class IslandDataManager {
         try {
             islandsConfig.save(islandsFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to save islands.yml", e);
         }
     }
 
@@ -86,6 +86,17 @@ public class IslandDataManager {
                 0
         );
     }
+
+    public int getLevel(String islandName, String type) {
+        if (Objects.equals(type, "generator")) {
+            return getGenLevel(islandName);
+        } else if (Objects.equals(type, "border")) {
+            return getBorderLevel(islandName);
+        } else {
+            return 0;
+        }
+    }
+
 
     public long getLastActive(String islandName) {
 
@@ -146,6 +157,15 @@ public class IslandDataManager {
         save();
     }
 
+    public void setUpgradeLevel(String islandName, String type, int level) {
+        islandsConfig.set(
+                "islands." + islandName + ".levels." + type + "-level",
+                level
+        );
+
+        save();
+    }
+
     public void updateLastActive(String islandName, long time) {
 
         islandsConfig.set(
@@ -168,4 +188,18 @@ public class IslandDataManager {
                         .getKeys(false)
         );
     }
+
+    public double getUpgradePrice(String islandName, String type) {
+
+        if (plugin.getConfig().getDouble("prices.upgrade-" + type + "-scale") < 0) {
+            return plugin.getConfig().getDouble("prices.upgrade-" + type + "-price");
+        }
+
+        return plugin.getConfig().getDouble("prices.upgrade-" + type + "-price", 100) * Math.pow(
+                1 + plugin.getConfig().getDouble("prices.upgrade-" + type + "-scale", 0.5),
+                getBorderLevel(islandName)
+        );
+
+    }
+
 }

@@ -1,5 +1,5 @@
 name: Skyblock
-version: '1.2.5'
+version: '1.3.0'
 main: net.teuos.skyblock.Skyblock
 api-version: '1.21'
 authors: [ teuos ]
@@ -66,11 +66,15 @@ permissions:
     description: Allows the ability to level up their world border
     default: true
 
+  skyblock.island.menu:
+    description: Allows the player to open the main skyblock menu
+    default: true
+
   skyblock.reload:
     description: Allows reloading the plugin
     default: op
 
-  skyblock.teleport:
+  skyblock.others.teleport:
     description: Allows user to teleport to other islands regardless of blocked status
     default: op
 
@@ -84,6 +88,10 @@ permissions:
 
   skyblock.template.teleport:
     description: Allows teleportation to the template island
+    default: op
+
+  skyblock.others.setUpgradeLevel:
+    description: Allows the player to set the level of others upgrade levels
     default: op
 
   skyblock.admin:
