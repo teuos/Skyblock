@@ -312,4 +312,19 @@ public class IslandManager {
 
     }
 
+    public int teleportIsland(String islandName, Player player) {
+        if (!islandDataManager.islandExists(islandName)){
+            return 1;
+        }
+
+        try {
+            this.loadIsland(islandName);
+            World target = Bukkit.getWorld(islandName);
+            player.teleport(target.getSpawnLocation());
+            return 0;
+        } catch (IOException e) {
+            return 2;
+        }
+    }
+
 }

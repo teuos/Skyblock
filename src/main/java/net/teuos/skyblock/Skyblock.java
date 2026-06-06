@@ -7,8 +7,10 @@ import net.teuos.skyblock.commands.IslandCommands;
 import net.teuos.skyblock.commands.SkyblockCommands;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.listeners.CobbleGen;
+import net.teuos.skyblock.listeners.GUIListener;
 import net.teuos.skyblock.listeners.TeleportListeners;
 import net.teuos.skyblock.managers.*;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import net.milkbowl.vault.economy.Economy;
@@ -88,11 +90,11 @@ public final class Skyblock extends JavaPlugin {
 
         EcoManager ecoManager = new EcoManager(this, economy, islandDataManager);
 
+        GUIManager guiManager = new GUIManager();
+        GUIListener guiListener = new GUIListener(guiManager);
+        Bukkit.getPluginManager().registerEvents(guiListener, this);
 
         islandManager.startIslandUnloadTask();
-
-        System.out.println("Skyblock is enabled");
-
 
         // Register CobbleGen
         getServer().getPluginManager().registerEvents(new CobbleGen(levelManager, islandDataManager, this), this);
@@ -101,7 +103,7 @@ public final class Skyblock extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TeleportListeners(islandDataManager), this);
 
         // Register island commands
-        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder);
+        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
 
@@ -110,6 +112,7 @@ public final class Skyblock extends JavaPlugin {
         getCommand("sb").setExecutor(skyblockCommands);
         getCommand("skyblock").setExecutor(skyblockCommands);
 
+        this.getLogger().info(String.format("[Skyblock] - Enabled %s!", getDescription().getName()));
 
     }
 
