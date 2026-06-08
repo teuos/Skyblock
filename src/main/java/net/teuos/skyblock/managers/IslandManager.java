@@ -2,6 +2,9 @@ package net.teuos.skyblock.managers;
 
 
 import com.infernalsuite.asp.api.AdvancedSlimePaperAPI;
+import com.infernalsuite.asp.api.exceptions.CorruptedWorldException;
+import com.infernalsuite.asp.api.exceptions.NewerFormatException;
+import com.infernalsuite.asp.api.exceptions.UnknownWorldException;
 import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.api.world.SlimeWorld;
 import com.infernalsuite.asp.api.world.properties.SlimeProperties;
@@ -9,6 +12,7 @@ import com.infernalsuite.asp.api.world.properties.SlimePropertyMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.teuos.skyblock.Skyblock;
+import net.teuos.skyblock.objects.SpawnPoint;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -47,9 +51,9 @@ public class IslandManager {
 
             SlimePropertyMap props = new SlimePropertyMap();
 
-            props.setValue(SlimeProperties.SPAWN_X, 0);
-            props.setValue(SlimeProperties.SPAWN_Y, 60);
-            props.setValue(SlimeProperties.SPAWN_Z, 0);
+            props.setValue(SlimeProperties.SPAWN_X, (int) templateDataManager.getSpawnPoint(templateName).x());
+            props.setValue(SlimeProperties.SPAWN_Y, (int) templateDataManager.getSpawnPoint(templateName).y());
+            props.setValue(SlimeProperties.SPAWN_Z, (int) templateDataManager.getSpawnPoint(templateName).z());
 
             SlimeWorld template = slimeApi.readWorld(
                     templateLoader,
@@ -130,7 +134,7 @@ public class IslandManager {
     }
 
 
-    public void createTemplate(org.bukkit.entity.Player player, String templateName){
+    public void createTemplate(Player player, String templateName){
 
         if (islandExists(templateName)) {
             player.sendMessage(ChatColor.RED + "An island named " + templateName + " already exists!");
@@ -145,12 +149,15 @@ public class IslandManager {
         }
 
         try {
+            templateDataManager.createRecord(templateName, heldItem);
 
             SlimePropertyMap props = new SlimePropertyMap();
 
-            props.setValue(SlimeProperties.SPAWN_X, 0);
-            props.setValue(SlimeProperties.SPAWN_Y, 60);
-            props.setValue(SlimeProperties.SPAWN_Z, 0);
+            SpawnPoint spawn = templateDataManager.getSpawnPoint(templateName);
+
+            props.setValue(SlimeProperties.SPAWN_X, ((int) spawn.x()));
+            props.setValue(SlimeProperties.SPAWN_Y, ((int) spawn.y()));
+            props.setValue(SlimeProperties.SPAWN_Z, ((int) spawn.z()));
 
             SlimeWorld template = slimeApi.createEmptyWorld(
                     templateName,
@@ -163,9 +170,11 @@ public class IslandManager {
 
             loadTemplate(templateName);
 
-            templateDataManager.createRecord(templateName, heldItem);
+            World world = Bukkit.getWorld(templateName);
 
-            permissionsManager.applyTemplateFlags(Bukkit.getWorld(templateName));
+            if (world != null) {
+                permissionsManager.applyTemplateFlags(world);
+            }
 
             player.sendMessage(ChatColor.GREEN + "Created Island Template");
 
@@ -206,6 +215,28 @@ public class IslandManager {
         }
 
 
+    }
+
+    public void updateTemplateSpawn(String templateName, SpawnPoint location){
+
+        if (location == null || !templateExists(templateName)) {
+            return;
+        }
+
+        templateDataManager.setSpawnPoint(templateName, location);
+        try {
+            SlimeWorld slimeWorld = slimeApi.readWorld(templateLoader, templateName, false, new SlimePropertyMap());
+            slimeWorld.getPropertyMap().setValue(SlimeProperties.SPAWN_X, ((int) location.x()));
+            slimeWorld.getPropertyMap().setValue(SlimeProperties.SPAWN_Y, ((int) location.y()));
+            slimeWorld.getPropertyMap().setValue(SlimeProperties.SPAWN_Z, ((int) location.z()));
+            World world = Bukkit.getWorld(templateName);
+            if (world != null) {
+                world.setSpawnLocation((int) location.x(), (int) location.y(), (int) location.z());
+            }
+            slimeApi.saveWorld(slimeWorld);
+        } catch (UnknownWorldException | IOException | CorruptedWorldException | NewerFormatException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void updateWorldBorder(String worldName) throws IOException {

@@ -1,5 +1,6 @@
 package net.teuos.skyblock.commands.island;
 
+import net.teuos.skyblock.commands.IslandCommands;
 import net.teuos.skyblock.gui.impl.MainGUI;
 import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.managers.GUIManager;
@@ -10,11 +11,13 @@ public class MenuCommand implements SubCommand {
 
     private final GUIManager guiManager;
     private final IslandManager islandManager;
+    private final IslandCommands islandCommands;
 
-    public MenuCommand(GUIManager guiManager, IslandManager islandManager) {
+    public MenuCommand(GUIManager guiManager, IslandManager islandManager, IslandCommands islandCommands) {
 
         this.guiManager = guiManager;
         this.islandManager = islandManager;
+        this.islandCommands = islandCommands;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class MenuCommand implements SubCommand {
 
     @Override
     public boolean execute(Player player, String[] args){
-        this.guiManager.openGUI(new MainGUI(islandManager), player);
+        this.guiManager.openGUI(new MainGUI(islandManager, islandCommands), player);
         return true;
     }
 

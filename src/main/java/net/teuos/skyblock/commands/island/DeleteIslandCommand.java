@@ -34,6 +34,11 @@ public class DeleteIslandCommand implements SubCommand {
     @Override
     public boolean execute(Player player, String[] args){
 
+        if (!islandManager.islandExists(player.getUniqueId().toString())) {
+            messageLibs.sendMessage(player, ChatColor.RED + "You don't have an island!.");
+            return true;
+        }
+
         this.guiManager.openGUI(new ConfirmIsDeleteGUI(result -> {
             if (result == true){
                 if (islandManager.deleteIsland(player.getUniqueId().toString())){

@@ -6,12 +6,18 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.teuos.skyblock.commands.IslandCommands;
+import net.teuos.skyblock.commands.island.CreateIslandCommand;
 import net.teuos.skyblock.gui.InventoryButton;
 import net.teuos.skyblock.gui.InventoryGUI;
+import net.teuos.skyblock.interfaces.SubCommand;
+import net.teuos.skyblock.managers.GUIManager;
 import net.teuos.skyblock.managers.IslandManager;
+import net.teuos.skyblock.managers.TemplateDataManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -25,9 +31,11 @@ import java.util.UUID;
 public class MainGUI extends InventoryGUI {
 
     private final IslandManager islandManager;
+    private final IslandCommands islandCommands;
 
-    public MainGUI(IslandManager islandManager) {
+    public MainGUI(IslandManager islandManager, IslandCommands islandCommands) {
         this.islandManager = islandManager;
+        this.islandCommands = islandCommands;
     }
 
 
@@ -214,8 +222,23 @@ public class MainGUI extends InventoryGUI {
 
         }).consumer(event -> {
             Player player = (Player) event.getWhoClicked();
-            islandManager.teleportIsland(player.getUniqueId().toString(), player);
+
+            SubCommand subCommand = islandCommands.subCommands.get("create");
+            if (subCommand == null){
+                player.sendMessage(Component.text("Unknown command!", NamedTextColor.RED));
+                player.closeInventory();
+                return;
+            }
+
+            if (!player.hasPermission(subCommand.getPermission()) && !player.hasPermission("skyblock.admin")) {
+                player.sendMessage(Component.text("You don't have permission to use this command!", NamedTextColor.RED));
+                player.closeInventory();
+                return;
+            }
+
             player.closeInventory();
+            subCommand.execute(player, null);
+
         });
     }
 

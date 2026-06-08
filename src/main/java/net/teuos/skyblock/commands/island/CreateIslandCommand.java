@@ -46,7 +46,7 @@ public class CreateIslandCommand implements SubCommand {
             messageLibs.sendMessage(player,ChatColor.RED + "You already have a skyblock island!");
             return true;
         }
-        if (args.length < 2) {
+        if (args == null || args.length < 2) {
             this.guiManager.openGUI(new IslandCreateGUI(templateDataManager, selected -> {
                 if (selected != null) {
                     islandManager.createIsland(player.getPlayer().getUniqueId().toString(), selected);

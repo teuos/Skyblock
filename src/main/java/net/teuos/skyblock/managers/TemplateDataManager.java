@@ -1,7 +1,11 @@
 package net.teuos.skyblock.managers;
 
 import net.teuos.skyblock.Skyblock;
+import net.teuos.skyblock.objects.SpawnPoint;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -49,6 +53,9 @@ public class TemplateDataManager {
     public void createRecord(String templateName, Material itemType){
         String path = "templates." + templateName;
         templatesConfig.set(path + ".guiItem", itemType.name());
+        templatesConfig.set(path + ".spawn-point.x", plugin.getConfig().getInt("templates.default-spawn-x"));
+        templatesConfig.set(path + ".spawn-point.y", plugin.getConfig().getInt("templates.default-spawn-y"));
+        templatesConfig.set(path + ".spawn-point.z", plugin.getConfig().getInt("templates.default-spawn-z"));
         save();
     }
 
@@ -81,6 +88,24 @@ public class TemplateDataManager {
                 .getKeys(false);
 
         return keys.size();
+    }
+
+    public SpawnPoint getSpawnPoint(String templateName){
+        String path = "templates." + templateName + ".spawn-point";
+
+        return new SpawnPoint(
+            templatesConfig.getDouble(path + ".x", 0),
+            templatesConfig.getDouble(path + ".y", 60),
+            templatesConfig.getDouble(path + ".z", 0)
+        );
+    }
+
+    public void setSpawnPoint(String templateName, SpawnPoint spawnPoint){
+        String path = "templates." + templateName + ".spawn-point";
+        templatesConfig.set(path + ".x", spawnPoint.x());
+        templatesConfig.set(path + ".y", spawnPoint.y());
+        templatesConfig.set(path + ".z", spawnPoint.z());
+        save();
     }
 
     public Configuration getConfig(){

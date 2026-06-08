@@ -54,8 +54,8 @@ public class IslandDataManager {
         islandsConfig.set(path + ".last-active", 0);
         islandsConfig.set(path + ".levels.generator-level", plugin.getConfig().getInt("levels.generator-level"));
         islandsConfig.set(path + ".levels.border-level", plugin.getConfig().getInt("levels.border-level"));
-        islandsConfig.set(path + ".blocked-players", plugin.getConfig().getString("blocked-players"));
-
+        islandsConfig.set(path + ".blocked-players", plugin.getConfig().getInt("blocked-players"));
+        islandsConfig.set(path + ".spawn-position.x", plugin.getConfig().getInt("spawn-position.x") );
         save();
 
     }

@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class IslandCommands implements CommandExecutor, TabCompleter {
 
-    private final Map<String, SubCommand> subCommands = new HashMap<String, SubCommand>();
+    public final Map<String, SubCommand> subCommands = new HashMap<String, SubCommand>();
 
     private final IslandLevelManager levelManager;
     private final IslandManager islandManager;
@@ -57,7 +57,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         register(new UntrustCommand(islandDataManager, islandManager, islandPermissionsManager, messageLibs));
         register(new BlockCommand(islandDataManager, messageLibs));
         register(new UnblockCommand(islandDataManager, messageLibs));
-        register(new MenuCommand(guiManager, islandManager));
+        register(new MenuCommand(guiManager, islandManager, this));
 
 
     }

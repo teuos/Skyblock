@@ -90,6 +90,10 @@ permissions:
     description: Allows teleportation to the template island
     default: op
 
+  skyblock.template.setSpawn:
+    description: Allows the player to set the templates default spawn point
+    default: op
+
   skyblock.others.setUpgradeLevel:
     description: Allows the player to set the level of others upgrade levels
     default: op

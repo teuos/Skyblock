@@ -3,6 +3,7 @@ package net.teuos.skyblock.commands;
 import net.teuos.skyblock.Skyblock;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.managers.*;
+import net.teuos.skyblock.objects.SpawnPoint;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -112,6 +113,22 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                 }
             }
 
+            else if (args[1].equalsIgnoreCase("setSpawn")){
+
+                if (!player.hasPermission("skyblock.template.setSpawn") && !player.hasPermission("skyblock.admin")) {
+                    messageLibs.sendMessage(player, ChatColor.RED + "You don't have permission to use this command!");
+                    return true;
+                }
+
+                String world = player.getLocation().getWorld().getName();
+
+                if (islandManager.templateExists(world)){
+                    islandManager.updateTemplateSpawn(world, new SpawnPoint(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ()));
+                } else {
+                    messageLibs.sendMessage(player, ChatColor.RED + "This isn't a template island!");
+                }
+            }
+
             else {
                 messageLibs.sendMessage(player, ChatColor.RED + "Unknown command!");
             }
@@ -215,6 +232,7 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                 completions.add("create");
                 completions.add("delete");
                 completions.add("teleport");
+                completions.add("setSpawn");
             }
 
             if (args[0].equalsIgnoreCase("setUpgradeLevel")) {
@@ -249,6 +267,17 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                         }
                     }
                 }
+
+                if (args[1].equalsIgnoreCase("setSpawn")) {
+                    File[] files = templatesFolder.listFiles();
+
+                    if (files != null) {
+                        for (File file : files) {
+                            completions.add(file.getName().replace(".slime", ""));
+                        }
+                    }
+                }
+
             }
 
             if (args[0].equalsIgnoreCase("setUpgradeLevel")) {

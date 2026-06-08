@@ -1,3 +1,6 @@
+# DO NOT CHANGE THIS!
+config-version: 1
+
 spawn:
   # what is the main spawn worlds name?
   spawn-world-name: world #default is world.
@@ -29,7 +32,6 @@ island:
   generate-diamond-level: 35
   generate-ancient-debris-level: 40
 
-
   # How rare should it be for ores to generate at their given level? (0-100%, 100% will cause the ore to always generate (Not recommended cobble may become impossible to get!))
   # Only touch this if you are sure you know what you are doing.
   generate-coal-percentage: 60
@@ -50,6 +52,12 @@ island:
 
   # How long should the plugin wait (in seconds) before unloading inactive islands? set to -1 to disable
   unload-delay: 600
+
+templates:
+  # What should the default spawn location be for template islands?
+  default-spawn-x: 0
+  default-spawn-y: 60
+  default-spawn-z: 0
 
 prices:
   # How much should it cost per level? if you have price scaling enabled, this will be the default price.
