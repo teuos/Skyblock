@@ -1,8 +1,7 @@
-package net.teuos.skyblock.commands.islandCommands;
+package net.teuos.skyblock.commands.island;
 
 import net.teuos.skyblock.interfaces.SubCommand;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;
 
 public class HelpCommand implements SubCommand {

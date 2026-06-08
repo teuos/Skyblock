@@ -1,10 +1,9 @@
-package net.teuos.skyblock.commands.islandCommands;
+package net.teuos.skyblock.commands.island;
 
 import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.managers.IslandDataManager;
 import net.teuos.skyblock.managers.IslandManager;
-import org.apache.logging.log4j.message.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;

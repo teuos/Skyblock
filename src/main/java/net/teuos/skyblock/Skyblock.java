@@ -5,6 +5,7 @@ import com.infernalsuite.asp.loaders.file.FileLoader;
 import com.sk89q.worldguard.WorldGuard;
 import net.teuos.skyblock.commands.IslandCommands;
 import net.teuos.skyblock.commands.SkyblockCommands;
+import net.teuos.skyblock.libs.CustomHeadLibs;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.listeners.CobbleGen;
 import net.teuos.skyblock.listeners.GUIListener;
@@ -48,11 +49,13 @@ public final class Skyblock extends JavaPlugin {
             return;
         }
 
-        File islandsFolder = new File(getDataFolder(), "islands");
+
 
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
         }
+
+        File islandsFolder = new File(getDataFolder(), "islands");
 
         if(!islandsFolder.exists()){
             islandsFolder.mkdir();
@@ -80,13 +83,19 @@ public final class Skyblock extends JavaPlugin {
         IslandDataManager islandDataManager =
                 new IslandDataManager(this);
 
+        TemplateDataManager templateDataManager =
+                new TemplateDataManager(this);
+
         MessageLibs messageLibs = new MessageLibs(this);
+
+        CustomHeadLibs customHeadLibs = new CustomHeadLibs();
+
 
         IslandPermissionsManager permissionsManager = new IslandPermissionsManager(islandDataManager, this);
 
         IslandLevelManager levelManager = new IslandLevelManager(islandDataManager, this);
 
-        IslandManager islandManager = new IslandManager(worldLoader, templateLoader, permissionsManager, islandDataManager, levelManager, this);
+        IslandManager islandManager = new IslandManager(worldLoader, templateLoader, permissionsManager, islandDataManager, templateDataManager, levelManager, this);
 
         EcoManager ecoManager = new EcoManager(this, economy, islandDataManager);
 
@@ -103,12 +112,12 @@ public final class Skyblock extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TeleportListeners(islandDataManager), this);
 
         // Register island commands
-        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager);
+        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager, templateDataManager);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
 
         // Register skyblock commands
-        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager, templatesFolder);
+        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager, templatesFolder, templateDataManager);
         getCommand("sb").setExecutor(skyblockCommands);
         getCommand("skyblock").setExecutor(skyblockCommands);
 

@@ -2,10 +2,7 @@ package net.teuos.skyblock.commands;
 
 import net.teuos.skyblock.Skyblock;
 import net.teuos.skyblock.libs.MessageLibs;
-import net.teuos.skyblock.managers.IslandDataManager;
-import net.teuos.skyblock.managers.IslandManager;
-import net.teuos.skyblock.managers.IslandLevelManager;
-import net.teuos.skyblock.managers.IslandPermissionsManager;
+import net.teuos.skyblock.managers.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -30,8 +27,9 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
     private final MessageLibs messageLibs;
     private final IslandDataManager islandDataManager;
     private final File templatesFolder;
+    private final TemplateDataManager templateDataManager;
 
-    public SkyblockCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, Skyblock plugin, MessageLibs messageLibs, IslandDataManager islandDataManager, File templatesFolder) {
+    public SkyblockCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, Skyblock plugin, MessageLibs messageLibs, IslandDataManager islandDataManager, File templatesFolder, TemplateDataManager templateDataManager) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
         this.islandPermissionsManager = islandPermissionsManager;
@@ -39,6 +37,7 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
         this.messageLibs = messageLibs;
         this.islandDataManager = islandDataManager;
         this.templatesFolder = templatesFolder;
+        this.templateDataManager = templateDataManager;
     }
 
 
@@ -177,6 +176,7 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
                 return true;
             }
 
+            islandDataManager.reload();
             plugin.reloadConfig();
 
             messageLibs.sendMessage(player, ChatColor.GREEN + "Config reloaded!");

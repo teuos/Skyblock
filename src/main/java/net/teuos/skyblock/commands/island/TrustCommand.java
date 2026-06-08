@@ -1,4 +1,4 @@
-package net.teuos.skyblock.commands.islandCommands;
+package net.teuos.skyblock.commands.island;
 
 import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.libs.MessageLibs;

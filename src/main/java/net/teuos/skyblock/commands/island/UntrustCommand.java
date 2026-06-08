@@ -1,4 +1,4 @@
-package net.teuos.skyblock.commands.islandCommands;
+package net.teuos.skyblock.commands.island;
 
 import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.libs.MessageLibs;
@@ -8,7 +8,6 @@ import net.teuos.skyblock.managers.IslandPermissionsManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;

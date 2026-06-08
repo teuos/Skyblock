@@ -1,4 +1,4 @@
-package net.teuos.skyblock.commands.islandCommands.upgradeCommands;
+package net.teuos.skyblock.commands.island.upgrade;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.teuos.skyblock.interfaces.UpgradeSubCommand;
@@ -15,7 +15,7 @@ public class GeneratorUpgradeCommand implements UpgradeSubCommand {
     private final EcoManager ecoManager;
     private final IslandLevelManager islandLevelManager;
     private final MessageLibs messageLibs;
-    
+
     public GeneratorUpgradeCommand(EcoManager ecoManager, IslandLevelManager islandLevelManager, MessageLibs messageLibs) {
         this.ecoManager = ecoManager;
         this.islandLevelManager = islandLevelManager;

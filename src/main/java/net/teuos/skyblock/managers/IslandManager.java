@@ -6,9 +6,12 @@ import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.api.world.SlimeWorld;
 import com.infernalsuite.asp.api.world.properties.SlimeProperties;
 import com.infernalsuite.asp.api.world.properties.SlimePropertyMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.teuos.skyblock.Skyblock;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -25,8 +28,9 @@ public class IslandManager {
     private final IslandDataManager islandDataManager;
     private final IslandLevelManager islandLevelManager;
     private final Skyblock plugin;
+    private final TemplateDataManager templateDataManager;
 
-    public IslandManager(SlimeLoader loader, SlimeLoader templateLoader, IslandPermissionsManager permissionsManager, IslandDataManager islandDataManager, IslandLevelManager islandLevelManager, Skyblock plugin) {
+    public IslandManager(SlimeLoader loader, SlimeLoader templateLoader, IslandPermissionsManager permissionsManager, IslandDataManager islandDataManager, TemplateDataManager templateDataManager, IslandLevelManager islandLevelManager, Skyblock plugin) {
         this.loader = loader;
         this.templateLoader = templateLoader;
         this.slimeApi = AdvancedSlimePaperAPI.instance();
@@ -34,6 +38,7 @@ public class IslandManager {
         this.islandDataManager = islandDataManager;
         this.islandLevelManager = islandLevelManager;
         this.plugin = plugin;
+        this.templateDataManager = templateDataManager;
     }
 
     public boolean createIsland(String islandName, String templateName) {
@@ -132,6 +137,13 @@ public class IslandManager {
             return;
         }
 
+        Material heldItem = player.getInventory().getItemInMainHand().getType();
+
+        if (heldItem.isAir()){
+            player.sendMessage(Component.text("Please hold an item to be used as the GUI icon!", NamedTextColor.RED));
+            return;
+        }
+
         try {
 
             SlimePropertyMap props = new SlimePropertyMap();
@@ -150,6 +162,8 @@ public class IslandManager {
             slimeApi.saveWorld(template);
 
             loadTemplate(templateName);
+
+            templateDataManager.createRecord(templateName, heldItem);
 
             permissionsManager.applyTemplateFlags(Bukkit.getWorld(templateName));
 
@@ -180,6 +194,8 @@ public class IslandManager {
                     return 2;
                 }
             }
+
+            templateDataManager.deleteRecord(templateName);
 
             templateLoader.deleteWorld(templateName);
             return 0;

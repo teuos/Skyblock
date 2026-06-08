@@ -1,4 +1,4 @@
-package net.teuos.skyblock.commands.islandCommands.upgradeCommands;
+package net.teuos.skyblock.commands.island.upgrade;
 
 import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.interfaces.UpgradeSubCommand;
@@ -57,7 +57,7 @@ public class UpgradeCommand implements SubCommand {
             return true;
         }
 
-        UpgradeSubCommand subCommand = upgrades.get(args[0].toLowerCase());
+        UpgradeSubCommand subCommand = upgrades.get(args[1].toLowerCase());
 
         if (subCommand == null) {
             messageLibs.sendMessage(player, ChatColor.RED + "Unknown upgrade type: " + args[0]);

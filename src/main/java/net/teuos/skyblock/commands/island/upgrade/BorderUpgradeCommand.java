@@ -1,4 +1,4 @@
-package net.teuos.skyblock.commands.islandCommands.upgradeCommands;
+package net.teuos.skyblock.commands.island.upgrade;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.teuos.skyblock.interfaces.UpgradeSubCommand;

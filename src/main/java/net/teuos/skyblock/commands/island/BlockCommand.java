@@ -1,4 +1,4 @@
-package net.teuos.skyblock.commands.islandCommands;
+package net.teuos.skyblock.commands.island;
 
 import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.libs.MessageLibs;
@@ -7,37 +7,42 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-public class UnblockCommand implements SubCommand {
+
+public class BlockCommand implements SubCommand {
 
     private final IslandDataManager islandDataManager;
     private final MessageLibs messageLibs;
 
-    public UnblockCommand(IslandDataManager islandDataManager, MessageLibs messageLibs) {
+
+    public BlockCommand(IslandDataManager islandDataManager, MessageLibs messageLibs) {
         this.islandDataManager = islandDataManager;
         this.messageLibs = messageLibs;
     }
 
     @Override
     public String getName() {
-        return "unblock";
+        return "block";
     }
 
     @Override
     public String getPermission() {
-        return "skyblock.island.unblock";
+        return "skyblock.island.block";
     }
 
     @Override
     public boolean execute(Player player, String[] args){
         if (args.length < 2) {
-            player.sendMessage(ChatColor.YELLOW + "Usage: /island unblock <player>");
+            player.sendMessage(ChatColor.YELLOW + "Usage: /island block <player>");
             return true;
         }
         if (islandDataManager.islandExists(player.getUniqueId().toString())) {
-            islandDataManager.removeBlockedPlayer(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]));
-            if (!islandDataManager.getBlockedStatus(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]))) {
-                messageLibs.sendMessage(player, ChatColor.GREEN + args[1] + " is no longer blocked from your island!");
-            } else {
+            islandDataManager.addBlockedPlayer(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]));
+            if (islandDataManager.getBlockedStatus(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]))) {
+                messageLibs.sendMessage(player,ChatColor.GREEN + args[1] + " is now blocked from your island!");
+                if (Bukkit.getPlayer(args[1]).getWorld().equals(Bukkit.getWorld(player.getUniqueId()))) {
+                    Bukkit.getPlayer(args[1]).teleport(Bukkit.getWorld("world").getSpawnLocation());
+                }
+            }  else {
                 messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
             }
         } else {
@@ -47,4 +52,3 @@ public class UnblockCommand implements SubCommand {
     }
 
 }
-

@@ -1,18 +1,13 @@
 package net.teuos.skyblock.commands;
 
-import net.milkbowl.vault.economy.EconomyResponse;
 import net.teuos.skyblock.Skyblock;
-import net.teuos.skyblock.commands.islandCommands.*;
-import net.teuos.skyblock.commands.islandCommands.upgradeCommands.UpgradeCommand;
-import net.teuos.skyblock.gui.impl.ConfirmIsDeleteGUI;
-import net.teuos.skyblock.gui.impl.MainGUI;
+import net.teuos.skyblock.commands.island.*;
+import net.teuos.skyblock.commands.island.upgrade.UpgradeCommand;
 import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.managers.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,7 +15,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,8 +33,9 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
     private final Skyblock plugin;
     private final File templatesFolder;
     private final GUIManager guiManager;
+    private final TemplateDataManager templateDataManager;
 
-    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, EcoManager ecoManager, Skyblock plugin, File templatesFolder, GUIManager guiManager) {
+    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, EcoManager ecoManager, Skyblock plugin, File templatesFolder, GUIManager guiManager, TemplateDataManager templateDataManager) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
         this.islandPermissionsManager = islandPermissionsManager;
@@ -50,11 +45,12 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
         this.templatesFolder = templatesFolder;
         this.guiManager = guiManager;
+        this.templateDataManager = templateDataManager;
 
         register(new HelpCommand());
         register(new TeleportCommand(islandManager, messageLibs));
         register(new UpgradeCommand(islandManager, messageLibs, islandDataManager, ecoManager, levelManager));
-        register(new CreateIslandCommand(messageLibs, islandDataManager, islandManager));
+        register(new CreateIslandCommand(messageLibs, islandDataManager, islandManager, templateDataManager, guiManager));
         register(new DeleteIslandCommand(guiManager, islandManager, messageLibs));
         register(new VisitCommand(messageLibs, islandDataManager, islandManager));
         register(new TrustCommand(islandDataManager, islandManager, islandPermissionsManager, messageLibs));
