@@ -59,14 +59,18 @@ public class MainGUI extends InventoryGUI {
             this.removeButton(11);
             this.addButton(11, createIsAccessButton(Material.TRIAL_KEY));
 
+            this.removeButton(13);
+            this.addButton(13, createIsTeleportButton("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmE0YzRhZGZmYWJiNjM4ZTNlNDFhOTM5YjRkZjE1ZWYzODA4MGMxNmMzNzkwODExOTExZGFkZjYyNjEzZDYifX19"));
+
             this.removeButton(15);
             this.addButton(15, createVisitMenuButton(Material.ENDER_EYE));
 
-            this.removeButton(22);
-            this.addButton(22, createIsTeleportButton("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmE0YzRhZGZmYWJiNjM4ZTNlNDFhOTM5YjRkZjE1ZWYzODA4MGMxNmMzNzkwODExOTExZGFkZjYyNjEzZDYifX19"));
-
             this.removeButton(29);
             this.addButton(29, createIsUpgradesMenuButton(Material.EXPERIENCE_BOTTLE));
+
+            this.removeButton(31);
+            this.addButton(31, createIsSellButton(Material.EMERALD));
+
 
             this.removeButton(33);
             this.addButton(33, createIsSettingsMenuButton(Material.COMPARATOR));
@@ -114,9 +118,60 @@ public class MainGUI extends InventoryGUI {
             item.setItemMeta(meta);
             return item;
         }).consumer(event -> {
-            event.setCancelled(true);
+            Player player = (Player) event.getWhoClicked();
+
+            SubCommand subCommand = islandCommands.subCommands.get("upgrade");
+
+            if (subCommand == null){
+                player.sendMessage(Component.text("Unknown command!", NamedTextColor.RED));
+                player.closeInventory();
+                return;
+            }
+
+            if (!player.hasPermission(subCommand.getPermission()) && !player.hasPermission("skyblock.admin")) {
+                player.sendMessage(Component.text("You don't have permission to use this command!", NamedTextColor.RED));
+                player.closeInventory();
+                return;
+            }
+
+            player.closeInventory();
+            subCommand.execute(player, null);
         });
     }
+
+    private InventoryButton createIsSellButton(Material material) {
+        return new InventoryButton().creator(player -> {
+            ItemStack item = new ItemStack(material);
+            ItemMeta meta = item.getItemMeta();
+            meta.displayName(Component.text("Sell").color(TextColor.color(0x84f564)).decoration(TextDecoration.ITALIC, false));
+            meta.lore(List.of(
+                    Component.text("Sell GUI", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false),
+                    Component.text("- Click to open", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
+            ));
+            item.setItemMeta(meta);
+            return item;
+        }).consumer(event -> {
+            Player player = (Player) event.getWhoClicked();
+
+            SubCommand subCommand = islandCommands.subCommands.get("sell");
+
+            if (subCommand == null){
+                player.sendMessage(Component.text("Unknown command!", NamedTextColor.RED));
+                player.closeInventory();
+                return;
+            }
+
+            if (!player.hasPermission(subCommand.getPermission()) && !player.hasPermission("skyblock.admin")) {
+                player.sendMessage(Component.text("You don't have permission to use this command!", NamedTextColor.RED));
+                player.closeInventory();
+                return;
+            }
+
+            player.closeInventory();
+            subCommand.execute(player, null);
+        });
+    }
+
 
     private InventoryButton createIsAccessButton(Material material) {
         return new InventoryButton().creator(player -> {

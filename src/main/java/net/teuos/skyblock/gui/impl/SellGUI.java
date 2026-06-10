@@ -130,7 +130,7 @@ public class SellGUI extends InventoryGUI {
         }
         player.closeInventory();
         ecoManager.deposit(player, total);
-        new MessageLibs(plugin).sendMessage(player, ChatColor.GREEN + "You have sold " + amountSold + " items for Ƿ" + ChatColor.GOLD + total + "!");
+        new MessageLibs(plugin).sendMessage(player, ChatColor.GREEN + "You have sold " + amountSold + " items for " + ChatColor.GOLD + plugin.getConfig().getString("price-unit") + total + "!");
     }
 
     private void handelClose(Player player, Inventory inv){

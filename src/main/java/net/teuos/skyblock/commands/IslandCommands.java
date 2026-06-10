@@ -51,7 +51,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
 
         register(new HelpCommand());
         register(new TeleportCommand(islandManager, messageLibs));
-        register(new UpgradeCommand(islandManager, messageLibs, islandDataManager, ecoManager, levelManager));
+        register(new UpgradeCommand(islandManager, messageLibs, ecoManager, levelManager, islandDataManager, guiManager, plugin));
         register(new CreateIslandCommand(messageLibs, islandDataManager, islandManager, templateDataManager, guiManager));
         register(new DeleteIslandCommand(guiManager, islandManager, messageLibs));
         register(new VisitCommand(messageLibs, islandDataManager, islandManager));

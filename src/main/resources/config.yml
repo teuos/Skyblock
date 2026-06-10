@@ -53,8 +53,9 @@ island:
   # How long should the plugin wait (in seconds) before unloading inactive islands? set to -1 to disable
   unload-delay: 600
 
+# what items should the player beable to sell and for how much?
 sell:
-  COBBLE_STONE: 1
+  COBBLESTONE: 1
   STONE: 1
   DEEPSLATE: 5
   COBBLED_DEEPSLATE: 5
@@ -86,6 +87,9 @@ templates:
   default-spawn-x: 0
   default-spawn-y: 60
   default-spawn-z: 0
+
+# What units should be used for prices? (Default: $)
+price-unit: $
 
 prices:
   # How much should it cost per level? if you have price scaling enabled, this will be the default price.
