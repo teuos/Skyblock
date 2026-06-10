@@ -99,6 +99,8 @@ public final class Skyblock extends JavaPlugin {
 
         EcoManager ecoManager = new EcoManager(this, economy, islandDataManager);
 
+        SellManager sellManager = new SellManager(this);
+
         GUIManager guiManager = new GUIManager();
         GUIListener guiListener = new GUIListener(guiManager);
         Bukkit.getPluginManager().registerEvents(guiListener, this);
@@ -112,7 +114,7 @@ public final class Skyblock extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TeleportListeners(islandDataManager), this);
 
         // Register island commands
-        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager, templateDataManager);
+        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager, templateDataManager, sellManager);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
 

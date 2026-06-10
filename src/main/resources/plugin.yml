@@ -70,6 +70,10 @@ permissions:
     description: Allows the player to open the main skyblock menu
     default: true
 
+  skyblock.sell:
+    description: Allows the player to open the sell menu
+    default: true
+
   skyblock.reload:
     description: Allows reloading the plugin
     default: op

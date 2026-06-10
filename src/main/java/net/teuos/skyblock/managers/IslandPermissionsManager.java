@@ -61,6 +61,12 @@ public class IslandPermissionsManager {
         global.setFlag(Flags.BUILD, StateFlag.State.ALLOW);
         global.setFlag(Flags.BUILD.getRegionGroupFlag(), RegionGroup.OWNERS);
         global.setFlag(Flags.BUILD.getRegionGroupFlag(), RegionGroup.MEMBERS);
+        global.setFlag(Flags.MOB_DAMAGE, StateFlag.State.ALLOW);
+        global.setFlag(Flags.MOB_DAMAGE.getRegionGroupFlag(), RegionGroup.OWNERS);
+        global.setFlag(Flags.MOB_DAMAGE.getRegionGroupFlag(), RegionGroup.MEMBERS);
+        global.setFlag(Flags.DAMAGE_ANIMALS, StateFlag.State.ALLOW);
+        global.setFlag(Flags.DAMAGE_ANIMALS.getRegionGroupFlag(), RegionGroup.OWNERS);
+        global.setFlag(Flags.DAMAGE_ANIMALS.getRegionGroupFlag(), RegionGroup.MEMBERS);
 
         // Set island owner to region owner
         DefaultDomain owner = global.getOwners();

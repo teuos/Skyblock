@@ -53,6 +53,34 @@ island:
   # How long should the plugin wait (in seconds) before unloading inactive islands? set to -1 to disable
   unload-delay: 600
 
+sell:
+  COBBLE_STONE: 1
+  STONE: 1
+  DEEPSLATE: 5
+  COBBLED_DEEPSLATE: 5
+  COAL: 5
+  COAL_BLOCK: 45
+  RAW_COPPER: 10
+  COPPER_INGOT: 10
+  RAW_IRON: 15
+  IRON_INGOT: 15
+  IRON_BLOCK: 135
+  RAW_GOLD: 20
+  GOLD_INGOT: 20
+  GOLD_BLOCK: 180
+  REDSTONE: 25
+  REDSTONE_BLOCK: 225
+  LAPIS: 30
+  LAPIS_BLOCK: 270
+  EMERALD: 50
+  EMERALD_BLOCK: 450
+  DIAMOND: 100
+  DIAMOND_BLOCK: 900
+  ANCIENT_DEBRIS: 200
+  NETHERITE_INGOT: 900
+  NETHERITE_BLOCK: 8100
+
+
 templates:
   # What should the default spawn location be for template islands?
   default-spawn-x: 0

@@ -34,8 +34,9 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
     private final File templatesFolder;
     private final GUIManager guiManager;
     private final TemplateDataManager templateDataManager;
+    private final SellManager sellManager;
 
-    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, EcoManager ecoManager, Skyblock plugin, File templatesFolder, GUIManager guiManager, TemplateDataManager templateDataManager) {
+    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, EcoManager ecoManager, Skyblock plugin, File templatesFolder, GUIManager guiManager, TemplateDataManager templateDataManager, SellManager sellManager) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
         this.islandPermissionsManager = islandPermissionsManager;
@@ -46,6 +47,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         this.templatesFolder = templatesFolder;
         this.guiManager = guiManager;
         this.templateDataManager = templateDataManager;
+        this.sellManager = sellManager;
 
         register(new HelpCommand());
         register(new TeleportCommand(islandManager, messageLibs));
@@ -57,8 +59,8 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         register(new UntrustCommand(islandDataManager, islandManager, islandPermissionsManager, messageLibs));
         register(new BlockCommand(islandDataManager, messageLibs));
         register(new UnblockCommand(islandDataManager, messageLibs));
+        register(new SellCommand(guiManager, ecoManager, sellManager, plugin));
         register(new MenuCommand(guiManager, islandManager, this));
-
 
     }
 
