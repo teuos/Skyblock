@@ -78,8 +78,8 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-            messageLibs.sendMessage(player, ChatColor.RED + "Usage: /island help");
-            return true;
+            SubCommand subCommand = subCommands.get("menu");
+            return subCommand.execute(player, args);
         }
 
         SubCommand subCommand = subCommands.get(args[0].toLowerCase());

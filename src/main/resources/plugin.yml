@@ -12,9 +12,13 @@ commands:
   island:
     description: Skyblock island commands
   sb:
-    description: Skyblock plugin commands
+    description: Skyblock island commands
   skyblock:
-    description: Skyblock plugin commands
+    description: Skyblock island commands
+  skyblockadmin:
+    description: Skyblock admin commands
+  sba:
+    description: Skyblock admin commands
 
 permissions:
 

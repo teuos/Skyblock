@@ -140,7 +140,7 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
             }
 
             if (args.length < 2) {
-                player.sendMessage(ChatColor.YELLOW + "Usage: /skyblock teleport <player>");
+                player.sendMessage(ChatColor.YELLOW + "Usage: /skyblockadmin teleport <player>");
             }
 
             if (islandDataManager.islandExists(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
@@ -162,7 +162,7 @@ public class SkyblockCommands implements CommandExecutor, TabCompleter {
             }
 
             if (args.length < 4) {
-                player.sendMessage(ChatColor.YELLOW + "Usage: /skyblock setUpgradeLevel <player> <type> <level>");
+                player.sendMessage(ChatColor.YELLOW + "Usage: /skyblockadmin setUpgradeLevel <player> <type> <level>");
             }
 
             Player target = Bukkit.getPlayer(args[1]);

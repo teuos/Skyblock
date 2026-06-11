@@ -117,11 +117,13 @@ public final class Skyblock extends JavaPlugin {
         IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager, templateDataManager, sellManager);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
+        getCommand("skyblock").setExecutor(islandCommands);
+        getCommand("sb").setExecutor(islandCommands);
 
         // Register skyblock commands
         SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager, templatesFolder, templateDataManager);
-        getCommand("sb").setExecutor(skyblockCommands);
-        getCommand("skyblock").setExecutor(skyblockCommands);
+        getCommand("sba").setExecutor(skyblockCommands);
+        getCommand("skyblockadmin").setExecutor(skyblockCommands);
 
         this.getLogger().info(String.format("[Skyblock] - Enabled %s!", getDescription().getName()));
 
