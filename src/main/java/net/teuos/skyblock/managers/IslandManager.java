@@ -68,11 +68,7 @@ public class IslandManager {
 
             loadIsland(islandName);
 
-            World world = Bukkit.getWorld(islandName);
-
             islandDataManager.createRecord(islandName);
-
-            permissionsManager.applyDefaultFlags(world, islandName);
 
             return true;
 

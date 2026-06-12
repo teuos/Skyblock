@@ -5,6 +5,7 @@ import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.managers.IslandDataManager;
 import net.teuos.skyblock.managers.IslandManager;
 import net.teuos.skyblock.managers.IslandPermissionsManager;
+import net.teuos.skyblock.protection.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -16,13 +17,13 @@ public class UntrustCommand implements SubCommand {
 
     private final IslandDataManager islandDataManager;
     private final IslandManager islandManager;
-    private final IslandPermissionsManager islandPermissionsManager;
+    private final PermissionManager permissionManager;
     private final MessageLibs messageLibs;
 
-    public UntrustCommand(IslandDataManager islandDataManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, MessageLibs messageLibs) {
+    public UntrustCommand(IslandDataManager islandDataManager, IslandManager islandManager, PermissionManager permissionManager, MessageLibs messageLibs) {
         this.islandDataManager = islandDataManager;
         this.islandManager = islandManager;
-        this.islandPermissionsManager = islandPermissionsManager;
+        this.permissionManager = permissionManager;
         this.messageLibs = messageLibs;
     }
 
@@ -36,24 +37,31 @@ public class UntrustCommand implements SubCommand {
     }
 
     public boolean execute(Player player, String[] args) {
-        try {
-            if (args.length < 2) {
-                player.sendMessage(ChatColor.YELLOW + "Usage: /island untrust <player>");
+        if (args.length < 2) {
+            player.sendMessage(ChatColor.YELLOW + "Usage: /island untrust <player>");
+            return true;
+        }
+        if (islandDataManager.islandExists(player.getUniqueId().toString())) {
+            if (islandDataManager.islandExists(player.getUniqueId().toString())) {
+                String targetWorld = player.getUniqueId().toString();
+                Player targetPlayer = Bukkit.getPlayer(args[1]);
+                if (targetPlayer == null) {
+                    messageLibs.sendMessage(player,
+                            ChatColor.RED + "Player not found!");
+                    return true;
+                }
+                if (targetPlayer.equals(player)) {
+                    messageLibs.sendMessage(player,
+                            ChatColor.RED + "You cannot change your own trust level!");
+                    return true;
+                }
+                permissionManager.removePlayerTrustLevel(targetPlayer, targetWorld);
+                messageLibs.sendMessage(player,
+                        ChatColor.GREEN + "Untrusted " + targetWorld + " from your island!");
                 return true;
             }
-            if (islandDataManager.islandExists(player.getUniqueId().toString())) {
-                islandManager.loadIsland(player.getUniqueId().toString());
-                World target = Bukkit.getWorld(player.getUniqueId().toString());
-                if (islandPermissionsManager.removeMember(Bukkit.getPlayer(args[1]), target)) {
-                    messageLibs.sendMessage(player,ChatColor.GREEN + args[1] + " is no longer trusted on your island!");
-                } else {
-                    messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
-                }
-            } else {
-                messageLibs.sendMessage(player,ChatColor.RED +  "you do not have a island!");
-            }
-        } catch (IOException e) {
-            messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");
+        } else {
+            messageLibs.sendMessage(player,ChatColor.RED +  "you do not have a island!");
         }
         return true;
     }

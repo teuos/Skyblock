@@ -6,6 +6,7 @@ import net.teuos.skyblock.commands.island.upgrade.UpgradeCommand;
 import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.managers.*;
+import net.teuos.skyblock.protection.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -35,8 +36,9 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
     private final GUIManager guiManager;
     private final TemplateDataManager templateDataManager;
     private final SellManager sellManager;
+    private final PermissionManager permissionManager;
 
-    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, EcoManager ecoManager, Skyblock plugin, File templatesFolder, GUIManager guiManager, TemplateDataManager templateDataManager, SellManager sellManager) {
+    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, EcoManager ecoManager, Skyblock plugin, File templatesFolder, GUIManager guiManager, TemplateDataManager templateDataManager, SellManager sellManager, PermissionManager permissionManager) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
         this.islandPermissionsManager = islandPermissionsManager;
@@ -48,6 +50,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         this.guiManager = guiManager;
         this.templateDataManager = templateDataManager;
         this.sellManager = sellManager;
+        this.permissionManager = permissionManager;
 
         register(new HelpCommand());
         register(new TeleportCommand(islandManager, messageLibs));
@@ -55,8 +58,8 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         register(new CreateIslandCommand(messageLibs, islandDataManager, islandManager, templateDataManager, guiManager));
         register(new DeleteIslandCommand(guiManager, islandManager, messageLibs));
         register(new VisitCommand(messageLibs, islandDataManager, islandManager));
-        register(new TrustCommand(islandDataManager, islandManager, islandPermissionsManager, messageLibs));
-        register(new UntrustCommand(islandDataManager, islandManager, islandPermissionsManager, messageLibs));
+        register(new TrustCommand(islandDataManager, islandManager, permissionManager, messageLibs));
+        register(new UntrustCommand(islandDataManager, islandManager, permissionManager, messageLibs));
         register(new BlockCommand(islandDataManager, messageLibs));
         register(new UnblockCommand(islandDataManager, messageLibs));
         register(new SellCommand(guiManager, ecoManager, sellManager, plugin));
@@ -173,6 +176,17 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                 }
             }
 
+            return completions;
+        }
+
+        if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("trust")) {
+                completions.add("manager");
+                completions.add("builder");
+                completions.add("container");
+                completions.add("interact");
+                completions.add("visitor");
+            }
             return completions;
         }
 
