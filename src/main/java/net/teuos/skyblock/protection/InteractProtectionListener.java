@@ -1,5 +1,8 @@
 package net.teuos.skyblock.protection;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,7 +47,12 @@ public class InteractProtectionListener implements Listener {
             type = ProtectionController.ProtectionType.INTERACT_PLAYER;
         }
 
-        controller.handle(player, type, event);
+        if (!(controller.handle(player, type, event))){
+            event.getPlayer().sendMessage(Component.text("Hey!", NamedTextColor.RED)
+                    .decoration(TextDecoration.BOLD, true)
+                    .append(Component.text(" you can't interact with that here!", NamedTextColor.GRAY)
+                            .decoration(TextDecoration.BOLD, false)));
+        }
 
 
     }

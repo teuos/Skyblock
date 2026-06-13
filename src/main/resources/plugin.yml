@@ -109,3 +109,11 @@ permissions:
   skyblock.admin:
     description: Full admin access
     default: op
+
+  skyblock.protect.island.bypass:
+    description: Bypass island protection
+    default: op
+
+  skyblock.protect.island.manage:
+    description: Allow a user to manager another persons island
+    default: op

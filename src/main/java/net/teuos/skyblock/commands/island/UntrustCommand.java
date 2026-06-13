@@ -58,6 +58,7 @@ public class UntrustCommand implements SubCommand {
                 permissionManager.removePlayerTrustLevel(targetPlayer, targetWorld);
                 messageLibs.sendMessage(player,
                         ChatColor.GREEN + "Untrusted " + targetWorld + " from your island!");
+                islandDataManager.removeTrustedPlayer(targetWorld, targetPlayer);
                 return true;
             }
         } else {

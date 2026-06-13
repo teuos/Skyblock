@@ -1,84 +1,91 @@
 package net.teuos.skyblock.gui.impl;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.teuos.skyblock.gui.InventoryButton;
 import net.teuos.skyblock.gui.InventoryGUI;
-import net.teuos.skyblock.managers.TemplateDataManager;
+import net.teuos.skyblock.managers.IslandDataManager;
+import net.teuos.skyblock.protection.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
-public class IslandCreateGUI extends InventoryGUI {
+public class PermissionsGUI extends InventoryGUI {
 
     private final Consumer<String> selected;
-    private final TemplateDataManager templateDataManager;
+    private final PermissionManager permissionManager;
+    private final IslandDataManager islandDataManager;
+
+
     private static final int PAGE_SIZE = 45;
     private int page;
-    private List<String> templates;
+    private List<String> players;
 
-
-    public IslandCreateGUI(TemplateDataManager templateDataManager, Consumer<String> selected) {
-        this.templateDataManager = templateDataManager;
+    public PermissionsGUI(Consumer<String> selected, PermissionManager permissionManager, IslandDataManager islandDataManager) {
         this.selected = selected;
-        this.page = 0;
+        this.permissionManager = permissionManager;
+        this.islandDataManager = islandDataManager;
     }
 
     private int getMaxPages() {
-        if (templates.isEmpty()) return 1;
-        return (int) Math.ceil((double) templates.size() / PAGE_SIZE);
+        if (players.isEmpty()) return 1;
+        return (int) Math.ceil((double) players.size() / PAGE_SIZE);
     }
 
     @Override
     protected Inventory createInventory() {
-        return Bukkit.createInventory(null, 9*6, "Island Create");
+        return Bukkit.createInventory(null, 9*6, Component.text("Trusted players", NamedTextColor.AQUA));
     }
 
     @Override
-    public void decorate(Player player){
+    public void decorate(Player player) {
 
         this.clearButtons();
         this.getInventory().clear();
 
-        var section = templateDataManager.getConfig().getConfigurationSection("templates");
-        if (section == null) {
-            this.templates = new ArrayList<>();
-            return;
-        }
-        this.templates = new ArrayList<>(section.getKeys(false));
+        this.players = new ArrayList<>(islandDataManager.getTrustedPlayers(player.getUniqueId().toString()));
 
-        int start = page * PAGE_SIZE;
-        int end = Math.min(start + PAGE_SIZE, templates.size());
+        int start = page*PAGE_SIZE;
+        int end = Math.min(start + PAGE_SIZE, players.size());
         int slot = 0;
 
         for (int i = start; i < end; i++) {
-            String template = templates.get(i);
+            String targetPlayer = players.get(i);
 
             this.addButton(slot, new InventoryButton().creator(p -> {
-                ItemStack item = new ItemStack(templateDataManager.getItemType(template));
-                ItemMeta meta = item.getItemMeta();
-                meta.displayName(Component.text(template, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false));
+                ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+                SkullMeta meta = (SkullMeta) item.getItemMeta();
+                if (meta == null){
+                    return item;
+                }
+                UUID uuid = UUID.fromString(targetPlayer);
+                PlayerProfile profile = Bukkit.createProfile(uuid);
+                meta.setPlayerProfile(profile);
+                meta.displayName(Component.text(Bukkit.getOfflinePlayer(uuid).getName(), NamedTextColor.GREEN));
                 meta.lore(List.of(
-                        Component.text("- Click to create", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
+                        Component.text("Trust level: ", NamedTextColor.GRAY)
+                                .append(permissionManager.getPlayerTrustLevel(uuid, player.getUniqueId().toString()).displayName())
                 ));
                 item.setItemMeta(meta);
                 return item;
             }).consumer(event -> {
-                event.setCancelled(true);
-                selected.accept(template);
                 event.getWhoClicked().closeInventory();
+                event.setCancelled(true);
+                selected.accept(targetPlayer);
             }));
-
             slot++;
-
         }
 
         for (int i = 45; i < 53; i++) {
@@ -95,17 +102,15 @@ public class IslandCreateGUI extends InventoryGUI {
         }
 
         this.addButton(53, closeButton());
-
         addNavButtons();
-
         super.decorate(player);
 
     }
 
-
     private void addNavButtons() {
 
         if (page > 0) {
+            removeButton(45);
             addButton(45, new InventoryButton().creator(p -> {
                 ItemStack item = new ItemStack(Material.ARROW);
                 ItemMeta meta = item.getItemMeta();
@@ -119,6 +124,7 @@ public class IslandCreateGUI extends InventoryGUI {
         }
 
         if (page < getMaxPages() - 1) {
+            removeButton(52);
             addButton(52, new InventoryButton().creator(p -> {
                 ItemStack item = new ItemStack(Material.ARROW);
                 ItemMeta meta = item.getItemMeta();
@@ -135,7 +141,7 @@ public class IslandCreateGUI extends InventoryGUI {
 
     private InventoryButton closeButton() {
         return new InventoryButton().creator(player -> {
-            ItemStack item = new ItemStack(Material.BARRIER);
+            ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
             ItemMeta meta = item.getItemMeta();
             meta.displayName(Component.text("Close", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
             meta.lore(List.of(
@@ -148,5 +154,6 @@ public class IslandCreateGUI extends InventoryGUI {
             player.closeInventory();
         });
     }
+
 
 }

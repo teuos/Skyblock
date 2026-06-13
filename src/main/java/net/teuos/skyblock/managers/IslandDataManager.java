@@ -137,6 +137,31 @@ public class IslandDataManager {
         save();
     }
 
+    public List<String> getTrustedPlayers(String islandName) {
+        return islandsConfig.getStringList("islands." + islandName + ".trusted-players");
+    }
+
+    public void addTrustedPlayer(String islandName, Player player) {
+        List<String> trustedPlayers = getTrustedPlayers(islandName);
+        if (!trustedPlayers.contains(player.getUniqueId().toString())) {
+            trustedPlayers.add(player.getUniqueId().toString());
+        }
+        islandsConfig.set(
+                "islands." + islandName + ".trusted-players", trustedPlayers
+        );
+        save();
+    }
+
+    public void removeTrustedPlayer(String islandName, Player player) {
+        List<String> trustedPlayers = getTrustedPlayers(islandName);
+        trustedPlayers.remove(player.getUniqueId().toString());
+        islandsConfig.set(
+                "islands." + islandName + ".trusted-players", trustedPlayers
+        );
+        save();
+    }
+
+
     public void updateBorderLevel(String islandName, int level) {
 
         islandsConfig.set(

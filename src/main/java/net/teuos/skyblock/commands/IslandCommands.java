@@ -58,7 +58,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         register(new CreateIslandCommand(messageLibs, islandDataManager, islandManager, templateDataManager, guiManager));
         register(new DeleteIslandCommand(guiManager, islandManager, messageLibs));
         register(new VisitCommand(messageLibs, islandDataManager, islandManager));
-        register(new TrustCommand(islandDataManager, islandManager, permissionManager, messageLibs));
+        register(new TrustCommand(islandDataManager, islandManager, permissionManager, messageLibs, guiManager));
         register(new UntrustCommand(islandDataManager, islandManager, permissionManager, messageLibs));
         register(new BlockCommand(islandDataManager, messageLibs));
         register(new UnblockCommand(islandDataManager, messageLibs));

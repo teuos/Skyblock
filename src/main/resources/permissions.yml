@@ -3,8 +3,7 @@
 # Group inheritance can be toggled in config.yml (Enabled by default)
 
 manager:
-  weight:
-    - -100
+  weight: -100
   inherits:
     - builder
   permissions:
@@ -12,8 +11,7 @@ manager:
     - skyblock.protect.island.manage
 
 builder:
-  weight:
-    - -110
+  weight: -110
   inherits:
     - container
   permissions:
@@ -23,12 +21,9 @@ builder:
     - skyblock.protect.block.spread
     - skyblock.protect.block.grow
     - skyblock.protect.fluid.flow
-    - skyblock.protect.interact.button
-    - skyblock.protect.interact.lever
 
 container:
-  weight:
-    - -120
+  weight: -120
   inherits:
     - interact
   permissions:
@@ -41,8 +36,7 @@ container:
     - skyblock.protect.entity.armorstand
 
 interact:
-  weight:
-    - -130
+  weight: -130
   inherits:
     - visitor
   permissions:
@@ -52,13 +46,15 @@ interact:
     - skyblock.protect.interact.trapdoor
     - skyblock.protect.interact.fencegate
     - skyblock.protect.interact.bed
+    - skyblock.protect.interact.button
+    - skyblock.protect.interact.lever
 
 visitor:
-  weight:
-    - -140
+  weight: -140
   inherits:
     - global
   permissions: []
 
 global:
+  weight: -150
   permissions: []

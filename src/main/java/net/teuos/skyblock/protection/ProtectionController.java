@@ -72,10 +72,7 @@ public class ProtectionController {
 
         if (event instanceof Cancellable c) {
             c.setCancelled(true);
-            player.sendMessage(Component.text("Hey!", NamedTextColor.RED)
-                    .decoration(TextDecoration.BOLD, true)
-                    .append(Component.text(" you can't do that here!", NamedTextColor.GRAY)
-                            .decoration(TextDecoration.BOLD, false)));
+
         }
 
         return false;

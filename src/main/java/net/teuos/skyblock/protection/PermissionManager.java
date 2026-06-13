@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.UUID;
 
 public class PermissionManager {
 
@@ -21,14 +22,12 @@ public class PermissionManager {
         this.luckPerms = luckPerms;
     }
 
-    public void createGroup(String groupName, int weight) {
+    public void createGroup(String groupName) {
         GroupManager gm = luckPerms.getGroupManager();
 
         if (gm.getGroup(groupName) != null) return;
 
         Group group = gm.createAndLoadGroup(groupName).join();
-
-        group.data().add(WeightNode.builder(weight).build());
 
         gm.saveGroup(group);
 
@@ -43,6 +42,14 @@ public class PermissionManager {
 
         group.data().add(node);
 
+        luckPerms.getGroupManager().saveGroup(group);
+    }
+
+    public void addWeightToGroup(String groupName, int weight) {
+        Group group = luckPerms.getGroupManager().getGroup(groupName);
+        if (group == null) return;
+        Node node = Node.builder("weight." + weight).build();
+        group.data().add(node);
         luckPerms.getGroupManager().saveGroup(group);
     }
 
@@ -73,9 +80,9 @@ public class PermissionManager {
 
     }
 
-    public TrustLevel getPlayerTrustLevel(Player player, String islandName) {
+    public TrustLevel getPlayerTrustLevel(UUID uuid, String islandName) {
 
-        User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+        User user = luckPerms.getUserManager().getUser(uuid);
         if (user == null) return TrustLevel.VISITOR;
 
         return user.getNodes().stream()
@@ -136,7 +143,9 @@ public class PermissionManager {
 
             String fullGroup = "skyblock_" + groupName;
 
-            createGroup(fullGroup, config.getInt(groupName + ".weight"));
+            createGroup(fullGroup);
+
+            addWeightToGroup(fullGroup, config.getInt(groupName + ".weight", 0));
 
             List<String> perms = config.getStringList(groupName + ".permissions");
             for (String perm : perms) {

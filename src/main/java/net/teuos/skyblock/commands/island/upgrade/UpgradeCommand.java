@@ -56,10 +56,6 @@ public class UpgradeCommand implements SubCommand {
         if (args == null || args.length < 2) {
             this.guiManager.openGUI(new UpgradeGUI(result -> {
 
-                System.out.println("RESULT FROM GUI: " + result);
-                System.out.println("AVAILABLE KEYS: " + upgrades.keySet());
-                System.out.println("PLAYER: " + player.getName());
-
                 UpgradeSubCommand subCommand = upgrades.get(result.toLowerCase());
 
                 if (subCommand == null) {

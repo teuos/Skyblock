@@ -1,5 +1,8 @@
 package net.teuos.skyblock.protection;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,7 +24,12 @@ public class ContainerProtectionListener implements Listener {
 
         if (!(event.getPlayer() instanceof Player p)) return;
 
-        controller.handle(p, ProtectionController.ProtectionType.INVENTORY, event);
+        if (!(controller.handle(p, ProtectionController.ProtectionType.INVENTORY, event))){
+            event.getPlayer().sendMessage(Component.text("Hey!", NamedTextColor.RED)
+                    .decoration(TextDecoration.BOLD, true)
+                    .append(Component.text(" you can't open containers here!", NamedTextColor.GRAY)
+                            .decoration(TextDecoration.BOLD, false)));
+        }
 
     }
 
@@ -36,7 +44,12 @@ public class ContainerProtectionListener implements Listener {
             default -> type = ProtectionController.ProtectionType.INTERACT_ENTITY;
         }
 
-        controller.handle(event.getPlayer(), type, event);
+        if (!(controller.handle(event.getPlayer(), type, event))){
+            event.getPlayer().sendMessage(Component.text("Hey!", NamedTextColor.RED)
+                    .decoration(TextDecoration.BOLD, true)
+                    .append(Component.text(" you can't interact with that here!", NamedTextColor.GRAY)
+                            .decoration(TextDecoration.BOLD, false)));
+        }
 
     }
 
