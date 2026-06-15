@@ -91,7 +91,7 @@ public class MainGUI extends InventoryGUI {
 
     private InventoryButton createCloseButton() {
         return new InventoryButton().creator(player -> {
-           ItemStack item = new ItemStack(Material.BARRIER);
+           ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
            ItemMeta meta = item.getItemMeta();
            meta.displayName(Component.text("Close", NamedTextColor.RED));
            meta.lore(List.of(

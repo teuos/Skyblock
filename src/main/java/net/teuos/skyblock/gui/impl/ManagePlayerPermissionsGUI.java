@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.teuos.skyblock.gui.InventoryButton;
 import net.teuos.skyblock.gui.InventoryGUI;
+import net.teuos.skyblock.managers.IslandDataManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -24,11 +25,16 @@ public class ManagePlayerPermissionsGUI extends InventoryGUI {
     private final Consumer<String> level;
     private final OfflinePlayer targetPlayer;
     private final String targetName;
+    private final IslandDataManager islandDataManager;
+    private final String islandName;
 
-    public ManagePlayerPermissionsGUI(Consumer<String> level, UUID targetUUID) {
+
+    public ManagePlayerPermissionsGUI(Consumer<String> level, UUID targetUUID, String islandName, IslandDataManager islandDataManager) {
         this.level = level;
+        this.islandName = islandName;
         this.targetPlayer = Bukkit.getOfflinePlayer(targetUUID);
-        this.targetName = targetPlayer.getName();
+        this.islandDataManager = islandDataManager;
+        this.targetName = islandDataManager.getTrustedPlayerName(islandName, targetUUID);
     }
 
     @Override

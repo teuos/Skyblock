@@ -8,6 +8,7 @@ import net.teuos.skyblock.managers.IslandPermissionsManager;
 import net.teuos.skyblock.protection.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -44,7 +45,7 @@ public class UntrustCommand implements SubCommand {
         if (islandDataManager.islandExists(player.getUniqueId().toString())) {
             if (islandDataManager.islandExists(player.getUniqueId().toString())) {
                 String targetWorld = player.getUniqueId().toString();
-                Player targetPlayer = Bukkit.getPlayer(args[1]);
+                OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(args[1]);
                 if (targetPlayer == null) {
                     messageLibs.sendMessage(player,
                             ChatColor.RED + "Player not found!");
@@ -57,7 +58,7 @@ public class UntrustCommand implements SubCommand {
                 }
                 permissionManager.removePlayerTrustLevel(targetPlayer, targetWorld);
                 messageLibs.sendMessage(player,
-                        ChatColor.GREEN + "Untrusted " + targetWorld + " from your island!");
+                        ChatColor.GREEN + "Untrusted " + targetPlayer.getName() + " from your island!");
                 islandDataManager.removeTrustedPlayer(targetWorld, targetPlayer);
                 return true;
             }

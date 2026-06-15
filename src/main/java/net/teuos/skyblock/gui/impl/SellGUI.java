@@ -209,7 +209,7 @@ public class SellGUI extends InventoryGUI {
 
     private InventoryButton cancelButton() {
         return new InventoryButton().creator(player -> {
-            ItemStack item = new ItemStack(Material.BARRIER);
+            ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
             ItemMeta meta = item.getItemMeta();
             meta.displayName(Component.text("Cancel", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
             meta.lore(List.of(

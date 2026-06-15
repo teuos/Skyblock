@@ -135,7 +135,7 @@ public class IslandCreateGUI extends InventoryGUI {
 
     private InventoryButton closeButton() {
         return new InventoryButton().creator(player -> {
-            ItemStack item = new ItemStack(Material.BARRIER);
+            ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
             ItemMeta meta = item.getItemMeta();
             meta.displayName(Component.text("Close", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
             meta.lore(List.of(

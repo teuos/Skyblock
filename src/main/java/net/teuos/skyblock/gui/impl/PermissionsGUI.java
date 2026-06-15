@@ -2,24 +2,28 @@ package net.teuos.skyblock.gui.impl;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.teuos.skyblock.Skyblock;
 import net.teuos.skyblock.gui.InventoryButton;
 import net.teuos.skyblock.gui.InventoryGUI;
+import net.teuos.skyblock.listeners.ChatInputListener;
 import net.teuos.skyblock.managers.IslandDataManager;
 import net.teuos.skyblock.protection.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.w3c.dom.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class PermissionsGUI extends InventoryGUI {
@@ -27,16 +31,20 @@ public class PermissionsGUI extends InventoryGUI {
     private final Consumer<String> selected;
     private final PermissionManager permissionManager;
     private final IslandDataManager islandDataManager;
-
+    private final Skyblock plugin;
+    private final Set<UUID> awaitingPlayerInput = new HashSet<>();
+    private final ChatInputListener chatInputListener;
 
     private static final int PAGE_SIZE = 45;
     private int page;
     private List<String> players;
 
-    public PermissionsGUI(Consumer<String> selected, PermissionManager permissionManager, IslandDataManager islandDataManager) {
+    public PermissionsGUI(Consumer<String> selected, PermissionManager permissionManager, IslandDataManager islandDataManager, Skyblock plugin, ChatInputListener chatInputListener) {
         this.selected = selected;
         this.permissionManager = permissionManager;
         this.islandDataManager = islandDataManager;
+        this.plugin = plugin;
+        this.chatInputListener = chatInputListener;
     }
 
     private int getMaxPages() {
@@ -73,10 +81,10 @@ public class PermissionsGUI extends InventoryGUI {
                 UUID uuid = UUID.fromString(targetPlayer);
                 PlayerProfile profile = Bukkit.createProfile(uuid);
                 meta.setPlayerProfile(profile);
-                meta.displayName(Component.text(Bukkit.getOfflinePlayer(uuid).getName(), NamedTextColor.GREEN));
+                meta.displayName(Component.text(islandDataManager.getTrustedPlayerName(player.getUniqueId().toString(), uuid), NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
                 meta.lore(List.of(
                         Component.text("Trust level: ", NamedTextColor.GRAY)
-                                .append(permissionManager.getPlayerTrustLevel(uuid, player.getUniqueId().toString()).displayName())
+                                .append(permissionManager.getPlayerTrustLevel(uuid, player.getUniqueId().toString()).displayName()).decoration(TextDecoration.ITALIC, false)
                 ));
                 item.setItemMeta(meta);
                 return item;
@@ -88,7 +96,7 @@ public class PermissionsGUI extends InventoryGUI {
             slot++;
         }
 
-        for (int i = 45; i < 53; i++) {
+        for (int i = 46; i < 53; i++) {
             this.addButton(i, new InventoryButton().creator(p -> {
                 ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
                 ItemMeta meta = item.getItemMeta();
@@ -101,6 +109,8 @@ public class PermissionsGUI extends InventoryGUI {
             }));
         }
 
+
+        this.addButton(45, addPlayerButton());
         this.addButton(53, closeButton());
         addNavButtons();
         super.decorate(player);
@@ -139,6 +149,41 @@ public class PermissionsGUI extends InventoryGUI {
 
     }
 
+    private InventoryButton addPlayerButton(){
+        return new InventoryButton().creator(player -> {
+            ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+            SkullMeta meta = (SkullMeta) item.getItemMeta();
+            PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
+            profile.setProperty(
+                    new ProfileProperty(
+                            "textures",
+                            "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjA1NmJjMTI0NGZjZmY5OTM0NGYxMmFiYTQyYWMyM2ZlZTZlZjZlMzM1MWQyN2QyNzNjMTU3MjUzMWYifX19"
+                    )
+            );
+            meta.setPlayerProfile(profile);
+            meta.displayName(Component.text("Trust player", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+            meta.lore(List.of(
+                    Component.text("- Click to trust a new player", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
+            ));
+            item.setItemMeta(meta);
+            return item;
+        }).consumer(event -> {
+            Player player = (Player) event.getWhoClicked();
+            player.closeInventory();
+            player.sendMessage("Send the player's name in chat...");
+            chatInputListener.requestInput(player, input -> {
+                Player target = Bukkit.getPlayerExact(input);
+                if (target == null) {
+                    player.sendMessage(Component.text("Player not found!", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+                    return;
+                }
+
+                selected.accept(target.getUniqueId().toString());
+            });
+
+        });
+    }
+
     private InventoryButton closeButton() {
         return new InventoryButton().creator(player -> {
             ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
@@ -154,6 +199,4 @@ public class PermissionsGUI extends InventoryGUI {
             player.closeInventory();
         });
     }
-
-
 }

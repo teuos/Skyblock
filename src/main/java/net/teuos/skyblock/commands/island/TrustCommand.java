@@ -1,10 +1,12 @@
 package net.teuos.skyblock.commands.island;
 
 import net.kyori.adventure.text.Component;
+import net.teuos.skyblock.Skyblock;
 import net.teuos.skyblock.gui.impl.ManagePlayerPermissionsGUI;
 import net.teuos.skyblock.gui.impl.PermissionsGUI;
 import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.libs.MessageLibs;
+import net.teuos.skyblock.listeners.ChatInputListener;
 import net.teuos.skyblock.managers.GUIManager;
 import net.teuos.skyblock.managers.IslandDataManager;
 import net.teuos.skyblock.managers.IslandManager;
@@ -12,6 +14,7 @@ import net.teuos.skyblock.managers.IslandPermissionsManager;
 import net.teuos.skyblock.protection.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -25,13 +28,17 @@ public class TrustCommand implements SubCommand {
     private final PermissionManager permissionManager;
     private final MessageLibs messageLibs;
     private final GUIManager guiManager;
+    private final Skyblock plugin;
+    private final ChatInputListener chatInputListener;
 
-    public TrustCommand(IslandDataManager islandDataManager, IslandManager islandManager, PermissionManager permissionManager, MessageLibs messageLibs, GUIManager guiManager) {
+    public TrustCommand(IslandDataManager islandDataManager, IslandManager islandManager, PermissionManager permissionManager, MessageLibs messageLibs, GUIManager guiManager, Skyblock plugin, ChatInputListener chatInputListener) {
         this.islandDataManager = islandDataManager;
         this.islandManager = islandManager;
         this.permissionManager = permissionManager;
         this.messageLibs = messageLibs;
         this.guiManager = guiManager;
+        this.plugin = plugin;
+        this.chatInputListener = chatInputListener;
     }
 
     @Override
@@ -51,9 +58,14 @@ public class TrustCommand implements SubCommand {
             if (islandDataManager.islandExists(player.getUniqueId().toString())) {
                 guiManager.openGUI(new PermissionsGUI(selected -> {
                     guiManager.openGUI(new ManagePlayerPermissionsGUI(level -> {
-                        trustPlayer(player, Bukkit.getPlayer(UUID.fromString(selected)), player.getUniqueId().toString(), PermissionManager.TrustLevel.valueOf(level.toUpperCase()));
-                    }, UUID.fromString(selected)), player);
-                }, permissionManager, islandDataManager), player);
+                        if (level.equals("remove")){
+                            untrustPlayer(player, Bukkit.getOfflinePlayer(UUID.fromString(selected)), player.getUniqueId().toString());
+                            islandDataManager.removeTrustedPlayer(player.getUniqueId().toString(), Bukkit.getOfflinePlayer(UUID.fromString(selected)));
+                        } else {
+                            trustPlayer(player, Bukkit.getOfflinePlayer(UUID.fromString(selected)), player.getUniqueId().toString(), PermissionManager.TrustLevel.valueOf(level.toUpperCase()));
+                        }
+                    }, UUID.fromString(selected), player.getUniqueId().toString(), islandDataManager), player);
+                }, permissionManager, islandDataManager, plugin, chatInputListener), player);
             } else {
                 messageLibs.sendMessage(player,ChatColor.RED +  "You do not have a island!");
             }
@@ -76,7 +88,7 @@ public class TrustCommand implements SubCommand {
 
         if (islandDataManager.islandExists(player.getUniqueId().toString())) {
             String targetWorld = player.getUniqueId().toString();
-            Player targetPlayer = Bukkit.getPlayer(args[1]);
+            OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(args[1]);
             trustPlayer(player, targetPlayer, targetWorld, level);
         } else {
             messageLibs.sendMessage(player,ChatColor.RED +  "You do not have a island!");
@@ -84,7 +96,20 @@ public class TrustCommand implements SubCommand {
         return true;
     }
 
-    private void trustPlayer(Player player, Player targetPlayer, String targetWorld, PermissionManager.TrustLevel level) {
+    private void untrustPlayer(Player player, OfflinePlayer targetPlayer, String targetWorld) {
+        if (targetPlayer == null){
+            messageLibs.sendMessage(player,ChatColor.RED + "Player not found!");
+            return;
+        }
+        if(targetPlayer.equals(player)){
+            messageLibs.sendMessage(player, ChatColor.RED + "You cannot change your own trust level!");
+        }
+        permissionManager.removePlayerTrustLevel(targetPlayer, targetWorld);
+        messageLibs.sendMessage(player, ChatColor.GREEN + "Removed " + targetPlayer.getName() + "'s trust!");
+
+    }
+
+    private void trustPlayer(Player player, OfflinePlayer targetPlayer, String targetWorld, PermissionManager.TrustLevel level) {
         if (targetPlayer == null) {
             messageLibs.sendMessage(player,
                     ChatColor.RED + "Player not found!");

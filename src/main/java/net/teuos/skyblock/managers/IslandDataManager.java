@@ -1,6 +1,8 @@
 package net.teuos.skyblock.managers;
 
 import net.teuos.skyblock.Skyblock;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class IslandDataManager {
@@ -138,26 +141,53 @@ public class IslandDataManager {
     }
 
     public List<String> getTrustedPlayers(String islandName) {
-        return islandsConfig.getStringList("islands." + islandName + ".trusted-players");
+        String path = "islands." + islandName + ".trusted-players";
+
+        if (islandsConfig.getConfigurationSection(path) == null) {
+            return new ArrayList<>();
+        }
+
+        return new ArrayList<>(
+                islandsConfig.getConfigurationSection(path).getKeys(false)
+        );
     }
 
-    public void addTrustedPlayer(String islandName, Player player) {
-        List<String> trustedPlayers = getTrustedPlayers(islandName);
-        if (!trustedPlayers.contains(player.getUniqueId().toString())) {
-            trustedPlayers.add(player.getUniqueId().toString());
+    public String getTrustedPlayerName(String islandName, UUID uuid) {
+        String path = "islands." + islandName + ".trusted-players." + uuid + ".name";
+
+        String storedName = islandsConfig.getString(path);
+
+        if (storedName != null) {
+            return storedName;
         }
-        islandsConfig.set(
-                "islands." + islandName + ".trusted-players", trustedPlayers
-        );
+
+        String bukkitName = Bukkit.getOfflinePlayer(uuid).getName();
+
+        if (bukkitName != null) {
+            return bukkitName;
+        }
+
+        return "Unknown Player";
+    }
+
+    public void addTrustedPlayer(String islandName, OfflinePlayer player) {
+
+        String uuid = player.getUniqueId().toString();
+
+        String path = "islands." + islandName + ".trusted-players." + uuid;
+        islandsConfig.set(path + ".name", player.getName());
         save();
     }
 
-    public void removeTrustedPlayer(String islandName, Player player) {
-        List<String> trustedPlayers = getTrustedPlayers(islandName);
-        trustedPlayers.remove(player.getUniqueId().toString());
-        islandsConfig.set(
-                "islands." + islandName + ".trusted-players", trustedPlayers
-        );
+    public void removeTrustedPlayer(String islandName, OfflinePlayer player) {
+
+        String uuid = player.getUniqueId().toString();
+
+        String path = "islands." + islandName + ".trusted-players." + uuid;
+
+        islandsConfig.set(path, null);
+
+        save();
         save();
     }
 

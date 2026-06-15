@@ -9,6 +9,7 @@ import net.teuos.skyblock.commands.IslandCommands;
 import net.teuos.skyblock.commands.SkyblockCommands;
 import net.teuos.skyblock.libs.CustomHeadLibs;
 import net.teuos.skyblock.libs.MessageLibs;
+import net.teuos.skyblock.listeners.ChatInputListener;
 import net.teuos.skyblock.listeners.CobbleGen;
 import net.teuos.skyblock.listeners.GUIListener;
 import net.teuos.skyblock.listeners.TeleportListeners;
@@ -135,11 +136,14 @@ public final class Skyblock extends JavaPlugin {
 
         // Register protection events
         getServer().getPluginManager().registerEvents(new BlockProtectionListener(protectionController), this);
-        getServer().getPluginManager().registerEvents(new ContainerProtectionListener(protectionController), this);
+
+        ChatInputListener chatInputListener = new ChatInputListener(this);
+        getServer().getPluginManager().registerEvents(chatInputListener, this);
+
         getServer().getPluginManager().registerEvents(new InteractProtectionListener(protectionController), this);
 
         // Register island commands
-        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager, templateDataManager, sellManager, permissionManager);
+        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager, templateDataManager, sellManager, permissionManager, chatInputListener);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
         getCommand("skyblock").setExecutor(islandCommands);

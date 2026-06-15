@@ -9,6 +9,7 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.WeightNode;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -67,9 +68,9 @@ public class PermissionManager {
 
     }
 
-    public void setPlayerTrustLevel(Player player, String islandName, String group){
+    public void setPlayerTrustLevel(OfflinePlayer player, String islandName, String group){
 
-        User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+        User user = luckPerms.getUserManager().loadUser(player.getUniqueId()).join();
 
         if (user == null) return;
 
@@ -82,7 +83,7 @@ public class PermissionManager {
 
     public TrustLevel getPlayerTrustLevel(UUID uuid, String islandName) {
 
-        User user = luckPerms.getUserManager().getUser(uuid);
+        User user = luckPerms.getUserManager().loadUser(uuid).join();
         if (user == null) return TrustLevel.VISITOR;
 
         return user.getNodes().stream()
@@ -102,8 +103,8 @@ public class PermissionManager {
                 .orElse(TrustLevel.VISITOR);
     }
 
-    public void removePlayerTrustLevel(Player player, String islandName){
-        User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+    public void removePlayerTrustLevel(OfflinePlayer player, String islandName){
+        User user = luckPerms.getUserManager().loadUser(player.getUniqueId()).join();
         if (user == null) return;
         user.data().clear(node ->
             node.getContexts().getAnyValue("world")
