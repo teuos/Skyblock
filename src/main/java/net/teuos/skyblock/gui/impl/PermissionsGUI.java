@@ -2,7 +2,6 @@ package net.teuos.skyblock.gui.impl;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -15,13 +14,10 @@ import net.teuos.skyblock.protection.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.w3c.dom.Text;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -32,7 +28,6 @@ public class PermissionsGUI extends InventoryGUI {
     private final PermissionManager permissionManager;
     private final IslandDataManager islandDataManager;
     private final Skyblock plugin;
-    private final Set<UUID> awaitingPlayerInput = new HashSet<>();
     private final ChatInputListener chatInputListener;
 
     private static final int PAGE_SIZE = 45;
@@ -120,8 +115,8 @@ public class PermissionsGUI extends InventoryGUI {
     private void addNavButtons() {
 
         if (page > 0) {
-            removeButton(45);
-            addButton(45, new InventoryButton().creator(p -> {
+            removeButton(46);
+            addButton(46, new InventoryButton().creator(p -> {
                 ItemStack item = new ItemStack(Material.ARROW);
                 ItemMeta meta = item.getItemMeta();
                 meta.displayName(Component.text("Back", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
@@ -170,7 +165,7 @@ public class PermissionsGUI extends InventoryGUI {
         }).consumer(event -> {
             Player player = (Player) event.getWhoClicked();
             player.closeInventory();
-            player.sendMessage("Send the player's name in chat...");
+            player.sendMessage("Send the player's name in chat... (10 seconds)");
             chatInputListener.requestInput(player, input -> {
                 Player target = Bukkit.getPlayerExact(input);
                 if (target == null) {

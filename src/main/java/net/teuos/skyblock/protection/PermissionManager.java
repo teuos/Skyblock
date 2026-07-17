@@ -107,9 +107,10 @@ public class PermissionManager {
         User user = luckPerms.getUserManager().loadUser(player.getUniqueId()).join();
         if (user == null) return;
         user.data().clear(node ->
-            node.getContexts().getAnyValue("world")
-                    .map(world -> world.equals(islandName))
-                    .orElse(false)
+            node.getKey().startsWith("group.skyblock_")
+                    && node.getContexts().getAnyValue("world")
+                            .map(world -> world.equals(islandName))
+                            .orElse(false)
         );
         luckPerms.getUserManager().saveUser(user);
     }

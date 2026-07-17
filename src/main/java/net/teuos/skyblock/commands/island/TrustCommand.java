@@ -89,6 +89,10 @@ public class TrustCommand implements SubCommand {
         if (islandDataManager.islandExists(player.getUniqueId().toString())) {
             String targetWorld = player.getUniqueId().toString();
             OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(args[1]);
+            if (!targetPlayer.hasPlayedBefore() && !targetPlayer.isOnline()) {
+                messageLibs.sendMessage(player, ChatColor.RED + "Player not found!");
+                return true;
+            }
             trustPlayer(player, targetPlayer, targetWorld, level);
         } else {
             messageLibs.sendMessage(player,ChatColor.RED +  "You do not have a island!");
@@ -103,6 +107,7 @@ public class TrustCommand implements SubCommand {
         }
         if(targetPlayer.equals(player)){
             messageLibs.sendMessage(player, ChatColor.RED + "You cannot change your own trust level!");
+            return;
         }
         permissionManager.removePlayerTrustLevel(targetPlayer, targetWorld);
         messageLibs.sendMessage(player, ChatColor.GREEN + "Removed " + targetPlayer.getName() + "'s trust!");
