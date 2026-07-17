@@ -17,6 +17,8 @@ import java.util.function.Consumer;
 
 public class ChatInputListener implements Listener {
 
+    private static final long INPUT_TIMEOUT_TICKS = 20L * 10; // 10 seconds
+
     private final Map<UUID, Consumer<String>> callbacks = new HashMap<>();
     private final Skyblock plugin;
 
@@ -29,13 +31,13 @@ public class ChatInputListener implements Listener {
         callbacks.put(uuid, callback);
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (callbacks.remove(uuid) != null) {
+            if (callbacks.remove(uuid, callback)) {
                 Player p = Bukkit.getPlayer(uuid);
                 if (p != null) {
                     p.sendMessage(Component.text("Input timed out!", NamedTextColor.RED));
                 }
             }
-        }, 20L * 10);
+        }, INPUT_TIMEOUT_TICKS);
     }
 
     @EventHandler

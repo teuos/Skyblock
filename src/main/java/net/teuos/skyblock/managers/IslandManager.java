@@ -278,7 +278,7 @@ public class IslandManager {
 
     public void startIslandUnloadTask() {
 
-        if (plugin.getConfig().getLong("island-unload-task") < 0) {
+        if (plugin.getConfig().getLong("islands.unload-delay", -1) < 0) {
             return;
         }
 
@@ -361,13 +361,18 @@ public class IslandManager {
         }
 
         try {
-            this.loadIsland(islandName);
-            World target = Bukkit.getWorld(islandName);
-            player.teleport(target.getSpawnLocation());
-            return 0;
+            if (!this.loadIsland(islandName)) {
+                return 2;
+            }
         } catch (IOException e) {
             return 2;
         }
+        World target = Bukkit.getWorld(islandName);
+        if (target == null) {
+            return 2;
+        }
+        player.teleport(target.getSpawnLocation());
+        return 0;
     }
 
 }

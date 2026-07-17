@@ -47,7 +47,7 @@ public class DeleteIslandCommand implements SubCommand {
                     messageLibs.sendMessage(player,ChatColor.RED + "Failed to delete island!");
                 }
             } else {
-                messageLibs.sendMessage(player,ChatColor.RED + "Failed to delete island!");
+                messageLibs.sendMessage(player, ChatColor.YELLOW + "Island deletion cancelled.");
             }
         }), player);
         return true;
