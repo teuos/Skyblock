@@ -74,7 +74,7 @@ public class PermissionManager {
 
         if (user == null) return;
 
-        Node node = Node.builder("group.skyblock_" + group).withContext("world", islandName).build();
+        Node node = Node.builder("group.skyblock_" + group.toLowerCase()).withContext("world", islandName).build();
 
         user.data().add(node);
         luckPerms.getUserManager().saveUser(user);

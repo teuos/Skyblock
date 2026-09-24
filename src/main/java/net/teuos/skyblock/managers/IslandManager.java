@@ -162,6 +162,7 @@ public class IslandManager {
                     templateLoader
             );
 
+
             slimeApi.saveWorld(template);
 
             loadTemplate(templateName);

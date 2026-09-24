@@ -62,6 +62,10 @@ public class ProtectionController {
             return true;
         }
 
+        if (player.getUniqueId().toString().equals(player.getWorld().getName())) {
+            return true;
+        }
+
         if (player.hasPermission("skyblock.protect.island.bypass")) {
             return true;
         }

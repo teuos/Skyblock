@@ -142,6 +142,8 @@ public final class Skyblock extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new InteractProtectionListener(protectionController), this);
 
+        getServer().getPluginManager().registerEvents(new ContainerProtectionListener(protectionController), this);
+
         // Register island commands
         IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager, templateDataManager, sellManager, permissionManager, chatInputListener);
         getCommand("is").setExecutor(islandCommands);

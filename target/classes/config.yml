@@ -1,0 +1,108 @@
+# DO NOT CHANGE THIS!
+config-version: 1
+
+spawn:
+  # what is the main spawn worlds name?
+  spawn-world-name: world #default is world.
+  
+island:
+
+  # What should the default world border size be?
+  default-border-size: 30
+
+  # By how much should the world border increase per level?
+  increase-border-amount: 20
+
+  # What level should players start at when making a new island?
+  # Recommend leaving this at 0.
+  default-border-level: 0
+  default-generator-level: 0
+
+  # Should the generators generate stone (true) or cobblestone (false)?
+  generate-stone: true
+
+  # At what levels should different ores start generating in island cobble generators? (set to -1 if you don't want the ore to generate ever)
+  generate-coal-level: 2
+  generate-copper-level: 5
+  generate-iron-level: 10
+  generate-gold-level: 15
+  generate-redstone-level: 20
+  generate-lapis-level: 25
+  generate-emerald-level: 30
+  generate-diamond-level: 35
+  generate-ancient-debris-level: 40
+
+  # How rare should it be for ores to generate at their given level? (0-100%, 100% will cause the ore to always generate (Not recommended cobble may become impossible to get!))
+  # Only touch this if you are sure you know what you are doing.
+  generate-coal-percentage: 60
+  generate-copper-percentage: 40
+  generate-iron-percentage: 25
+  generate-gold-percentage: 15
+  generate-redstone-percentage: 12
+  generate-lapis-percentage: 10
+  generate-emerald-percentage: 6
+  generate-diamond-percentage: 3
+  generate-ancient-debris-percentage: 1
+
+  # Do you want the generators to create deepslate? (set to -1 to disable)
+  generate-deepslate-level: 20
+  # How often do you want deepslate to generate in relation to cobblestone? (0-100%)
+  deepslate-generation-percentage: 30
+
+
+  # How long should the plugin wait (in seconds) before unloading inactive islands? set to -1 to disable
+  unload-delay: 600
+
+# what items should the player beable to sell and for how much?
+sell:
+  COBBLESTONE: 1
+  STONE: 1
+  DEEPSLATE: 5
+  COBBLED_DEEPSLATE: 5
+  COAL: 5
+  COAL_BLOCK: 45
+  RAW_COPPER: 10
+  COPPER_INGOT: 10
+  RAW_IRON: 15
+  IRON_INGOT: 15
+  IRON_BLOCK: 135
+  RAW_GOLD: 20
+  GOLD_INGOT: 20
+  GOLD_BLOCK: 180
+  REDSTONE: 25
+  REDSTONE_BLOCK: 225
+  LAPIS: 30
+  LAPIS_BLOCK: 270
+  EMERALD: 50
+  EMERALD_BLOCK: 450
+  DIAMOND: 100
+  DIAMOND_BLOCK: 900
+  ANCIENT_DEBRIS: 200
+  NETHERITE_INGOT: 900
+  NETHERITE_BLOCK: 8100
+
+
+templates:
+  # What should the default spawn location be for template islands?
+  default-spawn-x: 0
+  default-spawn-y: 60
+  default-spawn-z: 0
+
+# What units should be used for prices? (Default: $)
+price-unit: $
+
+prices:
+  # How much should it cost per level? if you have price scaling enabled, this will be the default price.
+  upgrade-border-price: 100 # default is 100
+  upgrade-generator-price: 100 # default is 100
+
+  # How much should the prices exponentially increase by per level?
+  # (set to -1 to disable price growth, every level will cost the same as the previous (upgrade-___-price))
+  # formula: default-upgrade-price x (1 + default-upgrade-scale)^(upgrade-level)
+  # e.g. 100 x (1 + 0.5)^(0) = 100 -> 100 x (1 + 0.5)^(1) = 150 -> 100 x (1 + 0.5)^(2) = 225
+  upgrade-border-scale: 0.5 # default is 0.5
+  upgrade-generator-scale: 0.5 # default is 0.5
+
+messages:
+  # What should the plugin messages be prefixed with?
+  prefix: "&6[Skyblock]"
