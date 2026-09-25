@@ -5,6 +5,7 @@ import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.managers.IslandDataManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class UnblockCommand implements SubCommand {
@@ -34,8 +35,13 @@ public class UnblockCommand implements SubCommand {
             return true;
         }
         if (islandDataManager.islandExists(player.getUniqueId().toString())) {
-            islandDataManager.removeBlockedPlayer(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]));
-            if (!islandDataManager.getBlockedStatus(player.getUniqueId().toString(), Bukkit.getPlayer(args[1]))) {
+            OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+            if (!target.hasPlayedBefore() && !target.isOnline()) {
+                messageLibs.sendMessage(player, ChatColor.RED + "Player not found!");
+                return true;
+            }
+            islandDataManager.removeBlockedPlayer(player.getUniqueId().toString(), target);
+            if (!islandDataManager.getBlockedStatus(player.getUniqueId().toString(), target)) {
                 messageLibs.sendMessage(player, ChatColor.GREEN + args[1] + " is no longer blocked from your island!");
             } else {
                 messageLibs.sendMessage(player,ChatColor.RED + "Somthing went wrong!");

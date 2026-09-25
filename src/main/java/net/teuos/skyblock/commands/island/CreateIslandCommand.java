@@ -48,8 +48,7 @@ public class CreateIslandCommand implements SubCommand {
         }
         if (args == null || args.length < 2) {
             this.guiManager.openGUI(new IslandCreateGUI(templateDataManager, selected -> {
-                if (selected != null) {
-                    islandManager.createIsland(player.getPlayer().getUniqueId().toString(), selected);
+                if (selected != null && islandManager.createIsland(player.getUniqueId().toString(), selected)) {
                     World target = Bukkit.getWorld(player.getUniqueId().toString());
                     player.teleport(target.getSpawnLocation());
                     messageLibs.sendMessage(player,ChatColor.GREEN + "Island has been created!");

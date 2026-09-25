@@ -63,7 +63,7 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         register(new VisitCommand(messageLibs, islandDataManager, islandManager));
         register(new TrustCommand(islandDataManager, islandManager, permissionManager, messageLibs, guiManager, plugin, chatInputListener));
         register(new UntrustCommand(islandDataManager, islandManager, permissionManager, messageLibs));
-        register(new BlockCommand(islandDataManager, messageLibs));
+        register(new BlockCommand(islandDataManager, messageLibs, plugin));
         register(new UnblockCommand(islandDataManager, messageLibs));
         register(new SellCommand(guiManager, ecoManager, sellManager, plugin));
         register(new MenuCommand(guiManager, islandManager, this));

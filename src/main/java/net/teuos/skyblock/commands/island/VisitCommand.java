@@ -41,34 +41,28 @@ public class VisitCommand implements SubCommand {
             return true;
         }
         String playerName = args[1];
-        OfflinePlayer target = Bukkit.getPlayer(playerName);
-        if (target == null) {
+        OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
+        if (!target.hasPlayedBefore() && !target.isOnline()) {
             messageLibs.sendMessage(player, ChatColor.RED + "Player " + playerName + " not found!");
             return true;
         }
-        try {
-            String islandOwner = target.getUniqueId().toString();
-            if (islandDataManager.islandExists(islandOwner)){
-                if (islandDataManager.getBlockedStatus(islandOwner, player)) {
-                    messageLibs.sendMessage(player,ChatColor.RED + "You have been blocked from visiting this island, please contact the island owner if you think this is a mistake!");
-                    return true;
-                }
-                try {
-                    islandManager.loadIsland(islandOwner);
-                    World world = Bukkit.getWorld(islandOwner);
-                    player.teleport(world.getSpawnLocation());
-                    messageLibs.sendMessage(player,ChatColor.GREEN + "Teleported to " + playerName + "'s island!");
-                    return true;
-                } catch (IOException e) {
-                    messageLibs.sendMessage(player,ChatColor.RED + "Failed to teleport to " + playerName + "'s island!");
-                    throw new RuntimeException(e);
-                }
-            } else {
-                messageLibs.sendMessage(player,ChatColor.RED + playerName + " does not have a island!");
+        String islandOwner = target.getUniqueId().toString();
+        if (islandDataManager.islandExists(islandOwner)){
+            if (islandDataManager.getBlockedStatus(islandOwner, player)) {
+                messageLibs.sendMessage(player,ChatColor.RED + "You have been blocked from visiting this island, please contact the island owner if you think this is a mistake!");
+                return true;
             }
-        } catch (IllegalArgumentException e) {
-            messageLibs.sendMessage(player,ChatColor.RED + playerName + " does not exist!");
-            return true;
+            try {
+                islandManager.loadIsland(islandOwner);
+                World world = Bukkit.getWorld(islandOwner);
+                player.teleport(world.getSpawnLocation());
+                messageLibs.sendMessage(player,ChatColor.GREEN + "Teleported to " + playerName + "'s island!");
+            } catch (IOException e) {
+                messageLibs.sendMessage(player,ChatColor.RED + "Failed to teleport to " + playerName + "'s island!");
+                throw new RuntimeException(e);
+            }
+        } else {
+            messageLibs.sendMessage(player,ChatColor.RED + playerName + " does not have a island!");
         }
         return true;
     }

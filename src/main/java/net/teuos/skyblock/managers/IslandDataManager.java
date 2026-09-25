@@ -113,14 +113,14 @@ public class IslandDataManager {
         return islandsConfig.getStringList("islands." + islandName + ".blocked-players");
     }
 
-    public boolean getBlockedStatus(String islandName, Player player) {
+    public boolean getBlockedStatus(String islandName, OfflinePlayer player) {
         List<String> blockedPlayers = getBlockedPlayers(islandName);
         return blockedPlayers.contains(player.getUniqueId().toString());
 
     }
 
 
-    public void addBlockedPlayer(String islandName, Player player) {
+    public void addBlockedPlayer(String islandName, OfflinePlayer player) {
         List<String> blockedPlayers = getBlockedPlayers(islandName);
         if (!blockedPlayers.contains(player.getUniqueId().toString())) {
             blockedPlayers.add(player.getUniqueId().toString());
@@ -131,7 +131,7 @@ public class IslandDataManager {
         save();
     }
 
-    public void removeBlockedPlayer(String islandName, Player player) {
+    public void removeBlockedPlayer(String islandName, OfflinePlayer player) {
         List<String> blockedPlayers = getBlockedPlayers(islandName);
         blockedPlayers.remove(player.getUniqueId().toString());
         islandsConfig.set(
@@ -187,7 +187,6 @@ public class IslandDataManager {
 
         islandsConfig.set(path, null);
 
-        save();
         save();
     }
 
@@ -252,7 +251,7 @@ public class IslandDataManager {
 
         return plugin.getConfig().getDouble("prices.upgrade-" + type + "-price", 100) * Math.pow(
                 1 + plugin.getConfig().getDouble("prices.upgrade-" + type + "-scale", 0.5),
-                getBorderLevel(islandName)
+                getLevel(islandName, type)
         );
 
     }
