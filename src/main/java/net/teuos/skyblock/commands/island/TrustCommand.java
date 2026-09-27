@@ -31,6 +31,7 @@ public class TrustCommand implements SubCommand {
     private final Skyblock plugin;
     private final ChatInputListener chatInputListener;
 
+
     public TrustCommand(IslandDataManager islandDataManager, IslandManager islandManager, PermissionManager permissionManager, MessageLibs messageLibs, GUIManager guiManager, Skyblock plugin, ChatInputListener chatInputListener) {
         this.islandDataManager = islandDataManager;
         this.islandManager = islandManager;
@@ -54,7 +55,7 @@ public class TrustCommand implements SubCommand {
     @Override
     public boolean execute(Player player, String[] args){
 
-        if (args.length < 2) {
+        if (args == null || args.length < 2) {
             if (islandDataManager.islandExists(player.getUniqueId().toString())) {
                 guiManager.openGUI(new PermissionsGUI(selected -> {
                     guiManager.openGUI(new ManagePlayerPermissionsGUI(level -> {

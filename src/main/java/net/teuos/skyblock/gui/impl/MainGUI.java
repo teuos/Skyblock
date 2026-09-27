@@ -185,7 +185,22 @@ public class MainGUI extends InventoryGUI {
             item.setItemMeta(meta);
             return item;
         }).consumer(event -> {
-            event.setCancelled(true);
+            Player player = (Player) event.getWhoClicked();
+            SubCommand subCommand = islandCommands.subCommands.get("access");
+            if (subCommand == null){
+                player.sendMessage(Component.text("Unknown command!", NamedTextColor.RED));
+                player.closeInventory();
+                return;
+            }
+
+            if (!player.hasPermission(subCommand.getPermission()) && !player.hasPermission("skyblock.admin")) {
+                player.sendMessage(Component.text("You don't have permission to use this command!", NamedTextColor.RED));
+                player.closeInventory();
+                return;
+            }
+
+            player.closeInventory();
+            subCommand.execute(player, null);
         });
     }
 

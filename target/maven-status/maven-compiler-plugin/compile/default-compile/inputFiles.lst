@@ -1,7 +1,9 @@
+C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\island\AccessCommand.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\island\BlockCommand.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\island\CreateIslandCommand.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\island\DeleteIslandCommand.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\island\HelpCommand.java
+C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\island\IslandPrivateCommand.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\island\MenuCommand.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\island\SellCommand.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\island\TeleportCommand.java
@@ -14,6 +16,7 @@ C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\island\VisitCommand.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\IslandCommands.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\commands\SkyblockCommands.java
+C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\gui\impl\AccessGUI.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\gui\impl\ConfirmIsDeleteGUI.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\gui\impl\ConfirmSaleGUI.java
 C:\Users\User\Desktop\Lootin\Skyblock\src\main\java\net\teuos\skyblock\gui\impl\ConfirmUpgradeGUI.java

@@ -57,6 +57,7 @@ public class IslandDataManager {
         islandsConfig.set(path + ".last-active", 0);
         islandsConfig.set(path + ".levels.generator-level", plugin.getConfig().getInt("levels.generator-level"));
         islandsConfig.set(path + ".levels.border-level", plugin.getConfig().getInt("levels.border-level"));
+        islandsConfig.set(path + ".private", false);
         islandsConfig.set(path + ".blocked-players", plugin.getConfig().getInt("blocked-players"));
         islandsConfig.set(path + ".spawn-position.x", plugin.getConfig().getInt("spawn-position.x") );
         save();
@@ -107,6 +108,19 @@ public class IslandDataManager {
                 "islands." + islandName + ".last-active",
                 0
         );
+    }
+
+    public boolean getPrivate(String islandName) {
+        return islandsConfig.getBoolean("islands." + islandName + ".private");
+    }
+
+    public void setPrivate(String islandName, boolean value) {
+        islandsConfig.set("islands." + islandName + ".private", value);
+        save();
+    }
+
+    public void togglePrivate(String islandName) {
+        setPrivate(islandName, !getPrivate(islandName));
     }
 
     public List<String> getBlockedPlayers(String islandName) {

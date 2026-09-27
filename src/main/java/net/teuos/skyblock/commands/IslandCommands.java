@@ -1,5 +1,6 @@
 package net.teuos.skyblock.commands;
 
+import com.sk89q.worldedit.function.mask.MaskUnion;
 import net.teuos.skyblock.Skyblock;
 import net.teuos.skyblock.commands.island.*;
 import net.teuos.skyblock.commands.island.upgrade.UpgradeCommand;
@@ -55,19 +56,21 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         this.permissionManager = permissionManager;
         this.chatInputListener = chatInputListener;
 
+
         register(new HelpCommand());
         register(new TeleportCommand(islandManager, messageLibs));
         register(new UpgradeCommand(islandManager, messageLibs, ecoManager, levelManager, islandDataManager, guiManager, plugin));
         register(new CreateIslandCommand(messageLibs, islandDataManager, islandManager, templateDataManager, guiManager));
         register(new DeleteIslandCommand(guiManager, islandManager, messageLibs));
-        register(new VisitCommand(messageLibs, islandDataManager, islandManager));
+        register(new VisitCommand(messageLibs, islandDataManager, islandManager, permissionManager));
         register(new TrustCommand(islandDataManager, islandManager, permissionManager, messageLibs, guiManager, plugin, chatInputListener));
         register(new UntrustCommand(islandDataManager, islandManager, permissionManager, messageLibs));
         register(new BlockCommand(islandDataManager, messageLibs));
         register(new UnblockCommand(islandDataManager, messageLibs));
+        register(new IslandPrivateCommand(islandDataManager, messageLibs, guiManager));
         register(new SellCommand(guiManager, ecoManager, sellManager, plugin));
         register(new MenuCommand(guiManager, islandManager, this));
-
+        register(new AccessCommand(guiManager, islandDataManager, this, messageLibs));
     }
 
 

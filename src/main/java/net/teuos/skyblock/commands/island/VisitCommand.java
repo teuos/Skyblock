@@ -4,6 +4,7 @@ import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.managers.IslandDataManager;
 import net.teuos.skyblock.managers.IslandManager;
+import net.teuos.skyblock.protection.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -11,17 +12,20 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class VisitCommand implements SubCommand {
 
     private final MessageLibs messageLibs;
     private final IslandDataManager islandDataManager;
     private final IslandManager islandManager;
+    private final PermissionManager permissionManager;
 
-    public VisitCommand(MessageLibs messageLibs, IslandDataManager islandDataManager, IslandManager islandManager) {
+    public VisitCommand(MessageLibs messageLibs, IslandDataManager islandDataManager, IslandManager islandManager, PermissionManager permissionManager) {
         this.messageLibs = messageLibs;
         this.islandDataManager = islandDataManager;
         this.islandManager = islandManager;
+        this.permissionManager = permissionManager;
     }
 
     @Override
@@ -51,6 +55,15 @@ public class VisitCommand implements SubCommand {
             if (islandDataManager.islandExists(islandOwner)){
                 if (islandDataManager.getBlockedStatus(islandOwner, player)) {
                     messageLibs.sendMessage(player,ChatColor.RED + "You have been blocked from visiting this island, please contact the island owner if you think this is a mistake!");
+                    return true;
+                }
+
+                UUID visitorUUID = player.getUniqueId();
+                boolean isOwner = visitorUUID.toString().equals(islandOwner);
+                boolean isAdmin = player.hasPermission("skyblock.admin");
+
+                if (!isOwner && !isAdmin && islandDataManager.getPrivate(islandOwner) && !permissionManager.getPlayerTrustLevel(player.getUniqueId(), islandOwner).atLeast(PermissionManager.TrustLevel.VISITOR)) {
+                    messageLibs.sendMessage(player, ChatColor.RED + "This island is set as Private! Please contact the island owner if you think this is a mistake!");
                     return true;
                 }
                 try {

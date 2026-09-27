@@ -13,6 +13,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,8 +84,11 @@ public class PermissionManager {
 
     public TrustLevel getPlayerTrustLevel(UUID uuid, String islandName) {
 
-        User user = luckPerms.getUserManager().loadUser(uuid).join();
-        if (user == null) return TrustLevel.VISITOR;
+        User user = luckPerms.getUserManager().getUser(uuid);
+        if (user == null) {
+            user = luckPerms.getUserManager().loadUser(uuid).join();
+        };
+        if (user == null) return TrustLevel.NONE;
 
         return user.getNodes().stream()
                 .filter(n -> n.getKey().startsWith("group.skyblock_"))
@@ -96,11 +100,11 @@ public class PermissionManager {
                     try {
                         return TrustLevel.valueOf(name);
                     } catch (IllegalArgumentException e) {
-                        return TrustLevel.VISITOR;
+                        return TrustLevel.NONE;
                     }
                 })
-                .findFirst()
-                .orElse(TrustLevel.VISITOR);
+                .max(Comparator.naturalOrder())
+                .orElse(TrustLevel.NONE);
     }
 
     public void removePlayerTrustLevel(OfflinePlayer player, String islandName){
@@ -118,6 +122,7 @@ public class PermissionManager {
 
     public enum TrustLevel {
 
+        NONE(Component.text("NONE", NamedTextColor.GRAY)),
         VISITOR(Component.text("VISITOR", NamedTextColor.GREEN)),
         INTERACT(Component.text("INTERACT", NamedTextColor.YELLOW)),
         CONTAINER(Component.text("CONTAINER", NamedTextColor.GOLD)),
@@ -132,6 +137,10 @@ public class PermissionManager {
 
         public Component displayName() {
             return display;
+        }
+
+        public boolean atLeast(TrustLevel other) {
+            return this.compareTo(other) >= 0;
         }
     }
 

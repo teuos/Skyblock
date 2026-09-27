@@ -79,6 +79,10 @@ permissions:
     description: Allows the player to open the sell menu
     default: true
 
+  skyblock.access:
+    description: Allows the player to open the trust menu
+    default: true
+
   skyblock.reload:
     description: Allows reloading the plugin
     default: op
