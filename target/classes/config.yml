@@ -91,6 +91,25 @@ templates:
 # What units should be used for prices? (Default: $)
 price-unit: $
 
+# how long should the plugin wait between stages for automatic farms?
+delays:
+  ores:
+    bedrock-to-cobble: 5 # default is 5 seconds
+    cobble-to-ore: 10 # default is 10 seconds
+
+# What percentage of time should an ore be selected over stone in automatic farms?
+# all default values are 50%
+ore-farm-odds:
+  coal_ore: 50
+  copper_ore: 50
+  iron_ore: 50
+  gold_ore: 50
+  redstone_ore: 50
+  lapis_ore: 50
+  diamond_ore: 50
+  emerald_ore: 50
+
+
 prices:
   # How much should it cost per level? if you have price scaling enabled, this will be the default price.
   upgrade-border-price: 100 # default is 100

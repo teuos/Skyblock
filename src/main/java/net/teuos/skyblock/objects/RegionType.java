@@ -1,4 +1,4 @@
-package enums;
+package net.teuos.skyblock.objects;
 
 import org.bukkit.Material;
 

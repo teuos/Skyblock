@@ -12,6 +12,7 @@ import net.teuos.skyblock.libs.MessageLibs;
 import net.teuos.skyblock.listeners.ChatInputListener;
 import net.teuos.skyblock.listeners.CobbleGen;
 import net.teuos.skyblock.listeners.GUIListener;
+import net.teuos.skyblock.listeners.SpawnOresListener;
 import net.teuos.skyblock.listeners.TeleportListeners;
 import net.teuos.skyblock.managers.*;
 import net.teuos.skyblock.protection.*;
@@ -100,6 +101,9 @@ public final class Skyblock extends JavaPlugin {
         TemplateDataManager templateDataManager =
                 new TemplateDataManager(this);
 
+        RegionDataManager regionDataManager =
+                new RegionDataManager(this);
+
         MessageLibs messageLibs = new MessageLibs(this);
 
         CustomHeadLibs customHeadLibs = new CustomHeadLibs();
@@ -144,6 +148,9 @@ public final class Skyblock extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new ContainerProtectionListener(protectionController), this);
 
+        // Register resource region ore respawning
+        getServer().getPluginManager().registerEvents(new SpawnOresListener(regionDataManager, this), this);
+
         // Register island commands
         IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager, templateDataManager, sellManager, permissionManager, chatInputListener);
         getCommand("is").setExecutor(islandCommands);
@@ -152,7 +159,7 @@ public final class Skyblock extends JavaPlugin {
         getCommand("sb").setExecutor(islandCommands);
 
         // Register skyblock commands
-        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager, templatesFolder, templateDataManager);
+        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager, templatesFolder, templateDataManager, regionDataManager);
         getCommand("sba").setExecutor(skyblockCommands);
         getCommand("skyblockadmin").setExecutor(skyblockCommands);
 

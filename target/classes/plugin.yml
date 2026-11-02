@@ -111,6 +111,26 @@ permissions:
     description: Allows the player to set the level of others upgrade levels
     default: op
 
+  skyblock.region:
+    description: Allows use of the resource region commands
+    default: op
+
+  skyblock.region.create:
+    description: Allows creating resource regions
+    default: op
+
+  skyblock.region.delete:
+    description: Allows deleting resource regions
+    default: op
+
+  skyblock.region.teleport:
+    description: Allows teleporting to resource regions
+    default: op
+
+  skyblock.region.list:
+    description: Allows listing resource regions
+    default: op
+
   skyblock.admin:
     description: Full admin access
     default: op
