@@ -32,6 +32,8 @@ public final class Skyblock extends JavaPlugin {
 
     private static Economy economy = null;
 
+    private SpawnOresListener spawnOresListener;
+
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
@@ -149,7 +151,8 @@ public final class Skyblock extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ContainerProtectionListener(protectionController), this);
 
         // Register resource region ore respawning
-        getServer().getPluginManager().registerEvents(new SpawnOresListener(regionDataManager, this), this);
+        spawnOresListener = new SpawnOresListener(regionDataManager, this);
+        getServer().getPluginManager().registerEvents(spawnOresListener, this);
 
         // Register island commands
         IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager, templateDataManager, sellManager, permissionManager, chatInputListener);
@@ -169,6 +172,11 @@ public final class Skyblock extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Put any ore region blocks that are mid-regen back to stone
+        if (spawnOresListener != null) {
+            spawnOresListener.restoreAll();
+        }
+
         System.out.println("Skyblock is disabled");
     }
 }
