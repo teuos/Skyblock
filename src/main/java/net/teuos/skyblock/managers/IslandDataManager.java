@@ -1,6 +1,8 @@
 package net.teuos.skyblock.managers;
 
 import net.teuos.skyblock.Skyblock;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class IslandDataManager {
@@ -54,8 +57,9 @@ public class IslandDataManager {
         islandsConfig.set(path + ".last-active", 0);
         islandsConfig.set(path + ".levels.generator-level", plugin.getConfig().getInt("levels.generator-level"));
         islandsConfig.set(path + ".levels.border-level", plugin.getConfig().getInt("levels.border-level"));
-        islandsConfig.set(path + ".blocked-players", plugin.getConfig().getString("blocked-players"));
-
+        islandsConfig.set(path + ".private", false);
+        islandsConfig.set(path + ".blocked-players", plugin.getConfig().getInt("blocked-players"));
+        islandsConfig.set(path + ".spawn-position.x", plugin.getConfig().getInt("spawn-position.x") );
         save();
 
     }
@@ -106,6 +110,19 @@ public class IslandDataManager {
         );
     }
 
+    public boolean getPrivate(String islandName) {
+        return islandsConfig.getBoolean("islands." + islandName + ".private");
+    }
+
+    public void setPrivate(String islandName, boolean value) {
+        islandsConfig.set("islands." + islandName + ".private", value);
+        save();
+    }
+
+    public void togglePrivate(String islandName) {
+        setPrivate(islandName, !getPrivate(islandName));
+    }
+
     public List<String> getBlockedPlayers(String islandName) {
         return islandsConfig.getStringList("islands." + islandName + ".blocked-players");
     }
@@ -136,6 +153,58 @@ public class IslandDataManager {
         );
         save();
     }
+
+    public List<String> getTrustedPlayers(String islandName) {
+        String path = "islands." + islandName + ".trusted-players";
+
+        if (islandsConfig.getConfigurationSection(path) == null) {
+            return new ArrayList<>();
+        }
+
+        return new ArrayList<>(
+                islandsConfig.getConfigurationSection(path).getKeys(false)
+        );
+    }
+
+    public String getTrustedPlayerName(String islandName, UUID uuid) {
+        String path = "islands." + islandName + ".trusted-players." + uuid + ".name";
+
+        String storedName = islandsConfig.getString(path);
+
+        if (storedName != null) {
+            return storedName;
+        }
+
+        String bukkitName = Bukkit.getOfflinePlayer(uuid).getName();
+
+        if (bukkitName != null) {
+            return bukkitName;
+        }
+
+        return "Unknown Player";
+    }
+
+    public void addTrustedPlayer(String islandName, OfflinePlayer player) {
+
+        String uuid = player.getUniqueId().toString();
+
+        String path = "islands." + islandName + ".trusted-players." + uuid;
+        islandsConfig.set(path + ".name", player.getName());
+        save();
+    }
+
+    public void removeTrustedPlayer(String islandName, OfflinePlayer player) {
+
+        String uuid = player.getUniqueId().toString();
+
+        String path = "islands." + islandName + ".trusted-players." + uuid;
+
+        islandsConfig.set(path, null);
+
+        save();
+        save();
+    }
+
 
     public void updateBorderLevel(String islandName, int level) {
 

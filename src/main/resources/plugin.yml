@@ -1,20 +1,25 @@
 name: Skyblock
-version: '1.3.0'
+version: '1.4.0'
 main: net.teuos.skyblock.Skyblock
-api-version: '1.21'
+api-version: '26.2'
 authors: [ teuos ]
 description: A skyblock core plugin
 depend:
   - WorldGuard
+  - LuckPerms
 commands:
   is:
     description: Skyblock island commands
   island:
     description: Skyblock island commands
   sb:
-    description: Skyblock plugin commands
+    description: Skyblock island commands
   skyblock:
-    description: Skyblock plugin commands
+    description: Skyblock island commands
+  skyblockadmin:
+    description: Skyblock admin commands
+  sba:
+    description: Skyblock admin commands
 
 permissions:
 
@@ -70,6 +75,14 @@ permissions:
     description: Allows the player to open the main skyblock menu
     default: true
 
+  skyblock.sell:
+    description: Allows the player to open the sell menu
+    default: true
+
+  skyblock.access:
+    description: Allows the player to open the trust menu
+    default: true
+
   skyblock.reload:
     description: Allows reloading the plugin
     default: op
@@ -90,10 +103,42 @@ permissions:
     description: Allows teleportation to the template island
     default: op
 
+  skyblock.template.setSpawn:
+    description: Allows the player to set the templates default spawn point
+    default: op
+
   skyblock.others.setUpgradeLevel:
     description: Allows the player to set the level of others upgrade levels
     default: op
 
+  skyblock.region:
+    description: Allows use of the resource region commands
+    default: op
+
+  skyblock.region.create:
+    description: Allows creating resource regions
+    default: op
+
+  skyblock.region.delete:
+    description: Allows deleting resource regions
+    default: op
+
+  skyblock.region.teleport:
+    description: Allows teleporting to resource regions
+    default: op
+
+  skyblock.region.list:
+    description: Allows listing resource regions
+    default: op
+
   skyblock.admin:
     description: Full admin access
+    default: op
+
+  skyblock.protect.island.bypass:
+    description: Bypass island protection
+    default: op
+
+  skyblock.protect.island.manage:
+    description: Allow a user to manager another persons island
     default: op

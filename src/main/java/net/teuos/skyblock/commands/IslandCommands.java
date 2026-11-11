@@ -1,18 +1,16 @@
 package net.teuos.skyblock.commands;
 
-import net.milkbowl.vault.economy.EconomyResponse;
+import com.sk89q.worldedit.function.mask.MaskUnion;
 import net.teuos.skyblock.Skyblock;
-import net.teuos.skyblock.commands.islandCommands.*;
-import net.teuos.skyblock.commands.islandCommands.upgradeCommands.UpgradeCommand;
-import net.teuos.skyblock.gui.impl.ConfirmIsDeleteGUI;
-import net.teuos.skyblock.gui.impl.MainGUI;
+import net.teuos.skyblock.commands.island.*;
+import net.teuos.skyblock.commands.island.upgrade.UpgradeCommand;
 import net.teuos.skyblock.interfaces.SubCommand;
 import net.teuos.skyblock.libs.MessageLibs;
+import net.teuos.skyblock.listeners.ChatInputListener;
 import net.teuos.skyblock.managers.*;
+import net.teuos.skyblock.protection.PermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,7 +18,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +25,7 @@ import java.util.Map;
 
 public class IslandCommands implements CommandExecutor, TabCompleter {
 
-    private final Map<String, SubCommand> subCommands = new HashMap<String, SubCommand>();
+    public final Map<String, SubCommand> subCommands = new HashMap<String, SubCommand>();
 
     private final IslandLevelManager levelManager;
     private final IslandManager islandManager;
@@ -39,8 +36,12 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
     private final Skyblock plugin;
     private final File templatesFolder;
     private final GUIManager guiManager;
+    private final TemplateDataManager templateDataManager;
+    private final SellManager sellManager;
+    private final PermissionManager permissionManager;
+    private final ChatInputListener chatInputListener;
 
-    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, EcoManager ecoManager, Skyblock plugin, File templatesFolder, GUIManager guiManager) {
+    public IslandCommands(IslandLevelManager levelManager, IslandManager islandManager, IslandPermissionsManager islandPermissionsManager, IslandDataManager islandDataManager, MessageLibs messageLibs, EcoManager ecoManager, Skyblock plugin, File templatesFolder, GUIManager guiManager, TemplateDataManager templateDataManager, SellManager sellManager, PermissionManager permissionManager, ChatInputListener chatInputListener) {
         this.levelManager = levelManager;
         this.islandManager = islandManager;
         this.islandPermissionsManager = islandPermissionsManager;
@@ -50,20 +51,26 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
         this.templatesFolder = templatesFolder;
         this.guiManager = guiManager;
+        this.templateDataManager = templateDataManager;
+        this.sellManager = sellManager;
+        this.permissionManager = permissionManager;
+        this.chatInputListener = chatInputListener;
+
 
         register(new HelpCommand());
         register(new TeleportCommand(islandManager, messageLibs));
-        register(new UpgradeCommand(islandManager, messageLibs, islandDataManager, ecoManager, levelManager));
-        register(new CreateIslandCommand(messageLibs, islandDataManager, islandManager));
+        register(new UpgradeCommand(islandManager, messageLibs, ecoManager, levelManager, islandDataManager, guiManager, plugin));
+        register(new CreateIslandCommand(messageLibs, islandDataManager, islandManager, templateDataManager, guiManager));
         register(new DeleteIslandCommand(guiManager, islandManager, messageLibs));
-        register(new VisitCommand(messageLibs, islandDataManager, islandManager));
-        register(new TrustCommand(islandDataManager, islandManager, islandPermissionsManager, messageLibs));
-        register(new UntrustCommand(islandDataManager, islandManager, islandPermissionsManager, messageLibs));
+        register(new VisitCommand(messageLibs, islandDataManager, islandManager, permissionManager));
+        register(new TrustCommand(islandDataManager, islandManager, permissionManager, messageLibs, guiManager, plugin, chatInputListener));
+        register(new UntrustCommand(islandDataManager, islandManager, permissionManager, messageLibs));
         register(new BlockCommand(islandDataManager, messageLibs));
         register(new UnblockCommand(islandDataManager, messageLibs));
-        register(new MenuCommand(guiManager, islandManager));
-
-
+        register(new IslandPrivateCommand(islandDataManager, messageLibs, guiManager));
+        register(new SellCommand(guiManager, ecoManager, sellManager, plugin));
+        register(new MenuCommand(guiManager, islandManager, this));
+        register(new AccessCommand(guiManager, islandDataManager, this, messageLibs));
     }
 
 
@@ -80,8 +87,8 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-            messageLibs.sendMessage(player, ChatColor.RED + "Usage: /island help");
-            return true;
+            SubCommand subCommand = subCommands.get("menu");
+            return subCommand.execute(player, args);
         }
 
         SubCommand subCommand = subCommands.get(args[0].toLowerCase());
@@ -175,6 +182,17 @@ public class IslandCommands implements CommandExecutor, TabCompleter {
                 }
             }
 
+            return completions;
+        }
+
+        if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("trust")) {
+                completions.add("manager");
+                completions.add("builder");
+                completions.add("container");
+                completions.add("interact");
+                completions.add("visitor");
+            }
             return completions;
         }
 

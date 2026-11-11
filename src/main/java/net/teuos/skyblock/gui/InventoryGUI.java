@@ -14,7 +14,7 @@ import java.util.Map;
 public abstract class InventoryGUI implements InventoryHandler {
 
     private final Inventory inventory;
-    private final Map<Integer, InventoryButton> buttonMap = new HashMap<>();
+    protected final Map<Integer, InventoryButton> buttonMap = new HashMap<>();
 
     public InventoryGUI() {
         this.inventory = this.createInventory();
@@ -26,6 +26,10 @@ public abstract class InventoryGUI implements InventoryHandler {
 
     public void removeButton(int slot) {
         buttonMap.remove(slot);
+    }
+
+    public void clearButtons() {
+        buttonMap.clear();
     }
 
     public void addButton(int slot, InventoryButton button) {

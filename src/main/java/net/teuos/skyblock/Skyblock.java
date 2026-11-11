@@ -3,14 +3,22 @@ package net.teuos.skyblock;
 import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.loaders.file.FileLoader;
 import com.sk89q.worldguard.WorldGuard;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import net.teuos.skyblock.commands.IslandCommands;
 import net.teuos.skyblock.commands.SkyblockCommands;
+import net.teuos.skyblock.libs.CustomHeadLibs;
 import net.teuos.skyblock.libs.MessageLibs;
+import net.teuos.skyblock.listeners.ChatInputListener;
 import net.teuos.skyblock.listeners.CobbleGen;
 import net.teuos.skyblock.listeners.GUIListener;
+import net.teuos.skyblock.listeners.SpawnOresListener;
 import net.teuos.skyblock.listeners.TeleportListeners;
 import net.teuos.skyblock.managers.*;
+import net.teuos.skyblock.protection.*;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import net.milkbowl.vault.economy.Economy;
@@ -23,6 +31,8 @@ public final class Skyblock extends JavaPlugin {
 
 
     private static Economy economy = null;
+
+    private SpawnOresListener spawnOresListener;
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
@@ -48,11 +58,13 @@ public final class Skyblock extends JavaPlugin {
             return;
         }
 
-        File islandsFolder = new File(getDataFolder(), "islands");
+
 
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
         }
+
+        File islandsFolder = new File(getDataFolder(), "islands");
 
         if(!islandsFolder.exists()){
             islandsFolder.mkdir();
@@ -64,10 +76,18 @@ public final class Skyblock extends JavaPlugin {
             templatesFolder.mkdir();
         }
 
+        File permissionsFile = new File(getDataFolder(), "permissions.yml");
+        if (!permissionsFile.exists()) {
+            saveResource("permissions.yml", false);
+        }
+
+        FileConfiguration permissionsConfig = YamlConfiguration.loadConfiguration(permissionsFile);
+
 
         SlimeLoader worldLoader = new FileLoader(islandsFolder);
         SlimeLoader templateLoader = new FileLoader(templatesFolder);
         WorldGuard worldGuardApi = WorldGuard.getInstance();
+        LuckPerms luckPerms = LuckPermsProvider.get();
 
         if (!setupEconomy() ) {
             getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
@@ -80,18 +100,36 @@ public final class Skyblock extends JavaPlugin {
         IslandDataManager islandDataManager =
                 new IslandDataManager(this);
 
+        TemplateDataManager templateDataManager =
+                new TemplateDataManager(this);
+
+        RegionDataManager regionDataManager =
+                new RegionDataManager(this);
+
         MessageLibs messageLibs = new MessageLibs(this);
+
+        CustomHeadLibs customHeadLibs = new CustomHeadLibs();
+
 
         IslandPermissionsManager permissionsManager = new IslandPermissionsManager(islandDataManager, this);
 
         IslandLevelManager levelManager = new IslandLevelManager(islandDataManager, this);
 
-        IslandManager islandManager = new IslandManager(worldLoader, templateLoader, permissionsManager, islandDataManager, levelManager, this);
+        IslandManager islandManager = new IslandManager(worldLoader, templateLoader, permissionsManager, islandDataManager, templateDataManager, levelManager, this);
 
         EcoManager ecoManager = new EcoManager(this, economy, islandDataManager);
 
+        SellManager sellManager = new SellManager(this);
+
         GUIManager guiManager = new GUIManager();
         GUIListener guiListener = new GUIListener(guiManager);
+
+        ProtectionController protectionController = new ProtectionController(islandDataManager);
+        PermissionManager permissionManager = new PermissionManager(luckPerms);
+
+        permissionManager.loadGroups(permissionsConfig);
+
+
         Bukkit.getPluginManager().registerEvents(guiListener, this);
 
         islandManager.startIslandUnloadTask();
@@ -102,15 +140,31 @@ public final class Skyblock extends JavaPlugin {
         // Register IslandLeave
         getServer().getPluginManager().registerEvents(new TeleportListeners(islandDataManager), this);
 
+        // Register protection events
+        getServer().getPluginManager().registerEvents(new BlockProtectionListener(protectionController), this);
+
+        ChatInputListener chatInputListener = new ChatInputListener(this);
+        getServer().getPluginManager().registerEvents(chatInputListener, this);
+
+        getServer().getPluginManager().registerEvents(new InteractProtectionListener(protectionController), this);
+
+        getServer().getPluginManager().registerEvents(new ContainerProtectionListener(protectionController), this);
+
+        // Register resource region ore respawning
+        spawnOresListener = new SpawnOresListener(regionDataManager, this);
+        getServer().getPluginManager().registerEvents(spawnOresListener, this);
+
         // Register island commands
-        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager);
+        IslandCommands islandCommands = new IslandCommands(levelManager, islandManager, permissionsManager, islandDataManager, messageLibs, ecoManager, this, templatesFolder, guiManager, templateDataManager, sellManager, permissionManager, chatInputListener);
         getCommand("is").setExecutor(islandCommands);
         getCommand("island").setExecutor(islandCommands);
+        getCommand("skyblock").setExecutor(islandCommands);
+        getCommand("sb").setExecutor(islandCommands);
 
         // Register skyblock commands
-        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager, templatesFolder);
-        getCommand("sb").setExecutor(skyblockCommands);
-        getCommand("skyblock").setExecutor(skyblockCommands);
+        SkyblockCommands skyblockCommands = new SkyblockCommands(levelManager, islandManager, permissionsManager, this, messageLibs, islandDataManager, templatesFolder, templateDataManager, regionDataManager);
+        getCommand("sba").setExecutor(skyblockCommands);
+        getCommand("skyblockadmin").setExecutor(skyblockCommands);
 
         this.getLogger().info(String.format("[Skyblock] - Enabled %s!", getDescription().getName()));
 
@@ -118,6 +172,11 @@ public final class Skyblock extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Put any ore region blocks that are mid-regen back to stone
+        if (spawnOresListener != null) {
+            spawnOresListener.restoreAll();
+        }
+
         System.out.println("Skyblock is disabled");
     }
 }
